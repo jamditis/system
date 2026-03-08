@@ -781,7 +781,7 @@ graph TB
 
   <p>Brain sync is a backup script that mirrors project directories between the two Pis. It runs on demand — triggered from the dashboard with one button or from the command line. If <code>officejawn</code> goes down (it runs on university wifi, which is exactly as reliable as that sounds), <code>houseofjawn</code> has a copy of everything.</p>
 
-  <p><code>officejawn</code> also runs a virtual desktop using Xvfb — a headless X server. On top of that, Playwright drives a Chromium browser for social media automation. Posting to Twitter, Bluesky, engaging with accounts on behalf of the Center for Cooperative Media. The browser runs in a persistent session with cookies and extensions loaded, accessible via VNC from any machine on the Tailscale network.</p>
+  <p><code>officejawn</code> also runs a virtual desktop using Xvfb — a headless X server. On top of that, Playwright drives a Chromium browser for social media automation. It scrolls Twitter and Bluesky on behalf of the Center for Cooperative Media — liking, reposting, and logging interesting threads for me and the team to review later. It doesn't post original content. The browser runs in a persistent session with cookies and extensions loaded, accessible via VNC from any machine on the Tailscale network.</p>
 
   <div class="screenshot">
     <img src="screenshots/c2-tools.jpg" alt="C2 panel showing scheduled wakes, event notifications, email drafts, and system state" loading="lazy">
