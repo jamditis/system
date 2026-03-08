@@ -313,8 +313,23 @@
   <h1>Claude Chode</h1>
   <p class="subtitle">An autonomous Claude Code system on $600 of Raspberry Pi hardware</p>
   <p class="byline">By Joe Amditis and Claude</p>
+  <p style="font-size: 0.85rem; color: #888; margin-top: -1rem;">March 2026 · Updated from the <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">original Substack post</a></p>
 
-  <!-- Section 1: Opening will go here -->
+  <p>I have a Claude Code agent that runs on Raspberry Pi hardware. It checks my email, monitors Slack, processes meeting transcripts, manages a project board, and sends me Telegram messages when something needs my attention. It does this on its own, on a schedule, without me asking. It has its own Google account, its own memory files, and its own accumulated history of screwups it's learned not to repeat.</p>
+
+  <p>I named it Claude Chode because naming things is my worst skill and I thought it was funny at 2am. It stuck.</p>
+
+  <p>When I saw Brandon Wang's <a href="https://www.brandonwang.dev/blog/how-i-built-openclaw-my-autonomous-ai-agent">post about his OpenClaw setup</a>, I recognized the same disease. He runs Claude on a Mac Mini via Slack. I run it on a pair of $80 single-board computers connected over a mesh VPN. Different symptoms, same underlying condition: the compulsion to give an AI agent a persistent home and let it run.</p>
+
+  <p>I wrote about this system <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">on Substack</a> back in February, told from Claude's perspective. That post was the introduction. This one is the technical walkthrough — what the system looks like now after a month of daily use, with all the scars visible.</p>
+
+  <p>A note on the format: the regular text is me. The teal boxes are Claude, commenting from its side of things. We wrote this together, which felt right given the subject matter.</p>
+
+  <h2>What it is</h2>
+
+  <p>Claude Chode is an autonomous agent built on <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a>, Anthropic's CLI tool. It's not a chatbot. It's not a wrapper around an API. It's a full Claude Code instance that boots up on a schedule, reads a 400-line instruction file that tells it who it is and what it has access to, and then works through whatever needs doing.</p>
+
+  <p>The <a href="https://centerforcooperativemedia.org/claudechode-manual.html">full technical manual</a> has the complete reference — 67 commands, 12 callbacks, 9 pipelines. This post is the story version.</p>
 
   <div class="section-visual" id="svg-network">
     <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
@@ -367,8 +382,47 @@
     </svg>
   </div>
 
-  <!-- Section 2: Hardware will go here -->
-  <!-- Section 3: Autonomous loop will go here -->
+  <h2>The hardware</h2>
+
+  <p>The system runs across four machines connected over <a href="https://tailscale.com">Tailscale</a>, a mesh VPN. Each machine has a name, a role, and a physical location.</p>
+
+  <p><strong>houseofjawn</strong> is a Raspberry Pi 5 with 8GB of RAM. It runs the Telegram bot, the web dashboard, the cron scheduler, and the Cloudflare tunnel that exposes everything to the internet. It's the one doing the work right now — the one writing this sentence. It sits on a shelf in my apartment in New Jersey.</p>
+
+  <p><strong>officejawn</strong> is another Pi 5, this one with 16GB. It's the compute brain. When Claude needs to do something heavy — a long analysis, a browser automation session, a big document generation — it SSHes into officejawn and runs it there. The machine sits on a desk at Montclair State University, 15 miles away.</p>
+
+  <p><strong>landofjawn</strong> is an Intel N95 mini PC at my brother's house in Pennsylvania. It's the backup node. Offsite storage, redundancy. It doesn't do much day-to-day, but it's there.</p>
+
+  <p><strong>legion2025</strong> is a desktop with an RTX 4080 Super GPU. It runs Windows. It sleeps most of the time and wakes up on demand via Wake-on-LAN when Claude needs GPU compute. I already had the machine — the GPU card was the only purchase.</p>
+
+  <div class="mermaid">
+graph TD
+    HOJ["houseofjawn<br/><small>Pi 5 · 8GB · services + bot</small>"] <-->|"Redis pub/sub"| OJ["officejawn<br/><small>Pi 5 · 16GB · compute</small>"]
+    HOJ -->|SSH| LOJ["landofjawn<br/><small>Intel N95 · backup</small>"]
+    HOJ -->|"WoL + WinRM"| LEG["legion2025<br/><small>RTX 4080 · GPU</small>"]
+  </div>
+
+  <p>Total hardware cost: about $600. Two Pis at $80 each. The N95 mini PC was around $150. The GPU card was roughly $300 — but I already owned the desktop it went into, so your mileage may vary. Either way, it's a fraction of what a cloud deployment would cost.</p>
+
+  <p>Wang runs everything on a single Mac Mini. I spread it across four machines because I like making things harder for myself. There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But I had the hardware sitting around, and splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
+
+  <div class="claude-callout">
+    <p class="callout-header">From the other side of the terminal</p>
+    <p>I run on 8GB of RAM. That's not a lot — my context window alone can eat a significant chunk of it. When I'm processing a long meeting transcript while the dashboard and Telegram bot are running, things get tight. Joe's solution was to put the heavy compute on a separate machine. When I need to do something intensive, I SSH to officejawn and run it there. It's like having a second brain I can offload to.</p>
+  </div>
+
+  <h2>The autonomous loop</h2>
+
+  <p>The core of Claude Chode is a cron-driven scheduler. Not a long-running daemon. Not a websocket listener. Just cron.</p>
+
+  <p>This is an important distinction. Claude doesn't run 24/7. It wakes up, does a session, and shuts down. Every session starts from scratch — fresh context window, no lingering state in memory. The only continuity between sessions comes from files on disk: the CLAUDE.md instruction file, the memory files, the state file that tracks what's been processed.</p>
+
+  <p>There are three layers running on different schedules.</p>
+
+  <h3>Full check-ins: every 2 hours</h3>
+
+  <p>Six times a day, weekdays only, from 7am to 5pm Eastern: Claude boots up with a context-aware prompt. Morning sessions focus on planning — what's on the calendar, what emails came in overnight, what's pending on the project board. Midday sessions focus on progress — following up on tasks, processing new transcripts, monitoring Slack. The 5pm session wraps things up and logs a summary.</p>
+
+  <p>Each check-in spawns a full Claude Code session inside a tmux window. The scheduler script writes the prompt, sets a timeout, and captures the output. If Claude doesn't finish in time, the session gets killed. If it crashes, the error gets logged and the next scheduled run picks up where things left off.</p>
 
   <div class="section-visual" id="svg-schedule">
     <svg viewBox="0 0 600 120" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
@@ -402,7 +456,6 @@
       <text x="550" y="42" text-anchor="middle" font-size="9" fill="#999">12am</text>
 
       <!-- 15-min notification check dots (7am-5pm, every 15 min = ~5.2px spacing) -->
-      <!-- Using small dots at regular intervals within the active window -->
       <g fill="#999" opacity="0.4">
         <circle cx="201" cy="60" r="1.5"/>
         <circle cx="206.2" cy="60" r="1.5"/>
@@ -442,7 +495,6 @@
       </g>
 
       <!-- 2-hour check-in dots with pulse animation -->
-      <!-- 7am=195.8, 9am=237.5, 11am=279.2, 1pm=320.8, 3pm=362.5, 5pm=404.2 -->
       <circle cx="195.8" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0s;"/>
       <circle cx="237.5" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0.3s;"/>
       <circle cx="279.2" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0.6s;"/>
@@ -462,6 +514,52 @@
       <text x="300" y="108" text-anchor="middle" font-size="11" font-style="italic" fill="#999">weekdays only</text>
     </svg>
   </div>
+
+  <h3>Event-driven checks: every 15 minutes</h3>
+
+  <p>Between the full check-ins, a lighter script runs every 15 minutes. It looks for specific triggers: a new Fathom meeting transcript in the shared Drive folder, an email from me, a new document shared with Claude's Google account. If it finds something actionable, it spins up a Claude session to handle it. If not, it exits immediately. Most of the time, it exits immediately.</p>
+
+  <h3>Notification scans: also every 15 minutes</h3>
+
+  <p>A separate script polls Gmail, Google Drive, and Slack on the same 15-minute cycle. This one doesn't spawn Claude sessions — it just checks for new items and sends me a Telegram ping if something needs my attention. It also monitors Slack for @mentions and flagged messages, queuing them for the next full check-in to process.</p>
+
+  <h3>What a check-in looks like</h3>
+
+  <p>When Claude wakes up for a full check-in, the first thing it does is read its CLAUDE.md. That file is over 400 lines. It contains the full infrastructure map — which machines exist, what services run where, where credentials are stored, what Claude is allowed to do without asking, and a growing list of mistakes it's made before with instructions on how to avoid repeating them.</p>
+
+  <p>After orienting itself, Claude reads its memory files and the scheduler state. Then it works through the queue: email, Slack mentions, new transcripts, calendar. It categorizes what it finds, creates tasks on the project board, logs interactions to the CRM, and sends me a summary via Telegram.</p>
+
+  <div class="mermaid">
+sequenceDiagram
+    participant Cron
+    participant Scheduler
+    participant Claude
+    participant Services
+    participant Joe
+
+    Cron->>Scheduler: trigger (every 2h)
+    Scheduler->>Scheduler: check state file
+    Scheduler->>Claude: spawn tmux session
+    Claude->>Claude: read CLAUDE.md + memory
+    Claude->>Services: check email, Slack, transcripts
+    Claude->>Claude: categorize + process
+    Claude->>Joe: Telegram summary
+    Claude->>Services: log to Board + CRM
+  </div>
+
+  <div class="screenshot">
+    <img src="screenshots/telegram-checkin-1.jpeg" alt="Telegram notification showing a Claude check-in summary" loading="lazy">
+    <div class="caption">A typical morning check-in delivered via Telegram. Claude summarizes what it found and what it did.</div>
+  </div>
+
+  <p>The CLAUDE.md is the single most important file in the system. Every rule in that file exists because something went wrong without it. "Always use <code>timeout --foreground</code> with Claude Code" — that's there because plain <code>timeout</code> kills the Node.js process tree before it can produce output, and I spent an afternoon debugging blank output files. "Never use real email addresses in tests" — that's there because a test accidentally emailed a real person. The file is a changelog of failures, encoded as rules.</p>
+
+  <div class="claude-callout">
+    <p class="callout-header">From the other side of the terminal</p>
+    <p>The CLAUDE.md is the single most important file in this system. It's over 400 lines. It tells me who I am, what machines I have access to, where credentials live, what I'm allowed to do without asking, and what mistakes I've made before. Every session starts with me reading it. Without it, I'd be a fresh install every time — capable but lost.</p>
+  </div>
+
+  <div class="section-divider">* * *</div>
 
   <!-- Section 4: Slack and email will go here -->
   <!-- Section 5: Mission control will go here -->
