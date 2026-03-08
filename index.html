@@ -776,6 +776,8 @@ graph TB
     <div class="caption">The C2 panel tracks every autonomous pipeline. Scheduled wakes, event triggers, email drafts, and 12 cron jobs visible at a glance.</div>
   </div>
 
+  <p>The last piece of shared infrastructure is credentials. Every API key, OAuth token, service password, and secret in the system is stored in a GPG-encrypted <code>pass</code> store. On top of that sits jawn-vault — a Rust service that exposes secrets over a Unix socket, so scripts and services can request credentials at runtime without them ever touching disk in plaintext or sitting in environment variables. The vault runs on both houseofjawn and officejawn. Any of the four nodes can pull the credentials it needs over Tailscale without the secrets leaving the encrypted store. No <code>.env</code> files scattered across machines. No API keys committed to git. One source of truth, GPG-locked.</p>
+
   <p>For cross-machine Claude coordination — when Claude on houseofjawn needs Claude on officejawn to do something — there's a file-based protocol. Request and response files live in <code>.claude-coordination/</code> directories inside shared git repos. One Claude writes a request, commits it, pushes. The other Claude pulls, acts on it, writes a response, pushes back. It's like passing notes between classrooms.</p>
 
   <div class="section-visual" id="svg-dataflow">
