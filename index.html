@@ -474,13 +474,13 @@
 
   <p>The system runs across four machines connected over <a href="https://tailscale.com">Tailscale</a>, a mesh VPN. Each machine has a name, a role, and a physical location.</p>
 
-  <p><strong>houseofjawn</strong> is a Raspberry Pi 5 with 8GB of RAM. It runs the Telegram bot, the web dashboard, the cron scheduler, and the Cloudflare tunnel that exposes everything to the internet. It's the one doing most of the autonomous work. It sits on a shelf in my apartment in New Jersey.</p>
+  <p><code><strong>houseofjawn</strong></code> is a Raspberry Pi 5 with 8GB of RAM. It runs the Telegram bot, the web dashboard, the cron scheduler, and the Cloudflare tunnel that exposes everything to the internet. It's the one doing most of the autonomous work. It sits on a shelf in my apartment in New Jersey.</p>
 
-  <p><strong>officejawn</strong> is another Pi 5, this one with 16GB. It's the compute brain. When Claude needs to do something heavy — a long analysis, a browser automation session, a big document generation — it SSHes into officejawn and runs it there. The machine sits on a desk at Montclair State University, 15 miles away.</p>
+  <p><code><strong>officejawn</strong></code> is another Pi 5, this one with 16GB. It's the compute brain. When Claude needs to do something heavy — a long analysis, a browser automation session, a big document generation — it SSHes into officejawn and runs it there. The machine sits on a desk at Montclair State University, 15 miles away.</p>
 
-  <p><strong>landofjawn</strong> is an Intel N95 mini PC at my brother's house in Pennsylvania. It's the backup node. Offsite storage, redundancy. It doesn't do much day-to-day, but it's there.</p>
+  <p><code><strong>landofjawn</strong></code> is an Intel N95 mini PC at my brother's house in Pennsylvania. It's the backup node. Offsite storage, redundancy. It doesn't do much day-to-day, but it's there.</p>
 
-  <p><strong>legion2025</strong> is a Lenovo prebuilt with an i9-14900KF, 32GB of RAM, and an RTX 4080 Super. It runs Windows. It sleeps most of the time and wakes up on demand via Wake-on-LAN when Claude needs GPU compute. I bought it as a personal work and gaming desktop in April 2025 — it predates this whole project.</p>
+  <p><code><strong>legion2025</strong></code> is a Lenovo prebuilt with an i9-14900KF, 32GB of RAM, and an RTX 4080 Super. It runs Windows. It sleeps most of the time and wakes up on demand via Wake-on-LAN when Claude needs GPU compute. I bought it as a personal work and gaming desktop in April 2025 — it predates this whole project.</p>
 
   <div class="mermaid">
 graph TD
@@ -489,15 +489,15 @@ graph TD
     HOJ -->|"WoL + WinRM"| LEG["legion2025<br/><small>RTX 4080 · GPU</small>"]
   </div>
 
-  <p>Total hardware cost for the dedicated nodes: about $688. The Pi 5 with 8GB (houseofjawn) was $160. The Pi 5 with 16GB (officejawn) was $300. The Intel N95 mini PC was $228. The Legion desktop was $2,735 but I bought that independently as a personal machine — it just happens to moonlight as a GPU worker when Claude needs it.</p>
+  <p>Total hardware cost for the dedicated nodes: about $688. The Pi 5 with 8GB (<code>houseofjawn</code>) was $160. The Pi 5 with 16GB (<code>officejawn</code>) was $300. The Intel N95 mini PC was $228. The Legion desktop was $2,735 but I bought that independently as a personal machine — it just happens to moonlight as a GPU worker when Claude needs it.</p>
 
-  <p>Wang runs his OpenClaw setup on a single Mac Mini. I spread it across four machines because some of the projects this system supports — like CJS2026, a conference registration site — aren't just my personal services. I can't risk them going offline if my building loses power or a node dies. The nodes are in three different physical locations connected over Tailscale. If houseofjawn goes down, landofjawn picks up the critical services. A single Mac Mini in a closet doesn't give you that.</p>
+  <p>Wang runs his OpenClaw setup on a single Mac Mini. I spread it across four machines because some of the projects this system supports — like CJS2026, a conference registration site — aren't just my personal services. I can't risk them going offline if my building loses power or a node dies. The nodes are in three different physical locations connected over Tailscale. If <code>houseofjawn</code> goes down, <code>landofjawn</code> picks up the critical services. A single Mac Mini in a closet doesn't give you that.</p>
 
   <p>There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
 
   <div class="claude-callout">
     <p class="callout-header">From the other side of the terminal</p>
-    <p>I run on 8GB of RAM. That's not a lot — my context window alone can eat a significant chunk of it. When I'm processing a long meeting transcript while the dashboard and Telegram bot are running, things get tight. Joe's solution was to put the heavy compute on a separate machine. When I need to do something intensive, I SSH to officejawn and run it there. It's like having a second brain I can offload to.</p>
+    <p>I run on 8GB of RAM. That's not a lot — my context window alone can eat a significant chunk of it. When I'm processing a long meeting transcript while the dashboard and Telegram bot are running, things get tight. Joe's solution was to put the heavy compute on a separate machine. When I need to do something intensive, I SSH to <code>officejawn</code> and run it there. It's like having a second brain I can offload to.</p>
   </div>
 
   <h2>The autonomous loop</h2>
@@ -615,7 +615,7 @@ graph TD
 
   <h3>What a check-in looks like</h3>
 
-  <p>When Claude wakes up for a full check-in, the first thing it does is read its CLAUDE.md. That file is over 400 lines. It contains the full infrastructure map — which machines exist, what services run where, where credentials are stored, what Claude is allowed to do without asking, and a growing list of mistakes it's made before with instructions on how to avoid repeating them.</p>
+  <p>When Claude wakes up for a full check-in, the first thing it does is read its CLAUDE.md. That file is more than 400 lines. It contains the full infrastructure map — which machines exist, what services run where, where credentials are stored, what Claude is allowed to do without asking, and a growing list of mistakes it's made before with instructions on how to avoid repeating them.</p>
 
   <p>After orienting itself, Claude reads its memory files and the scheduler state. Then it works through the queue: email, Slack mentions, new transcripts, calendar. It categorizes what it finds, creates tasks on the project board, logs interactions to the CRM, and sends me a summary via Telegram.</p>
 
@@ -646,7 +646,7 @@ sequenceDiagram
 
   <div class="claude-callout">
     <p class="callout-header">From the other side of the terminal</p>
-    <p>Joe's not exaggerating. It's over 400 lines. It tells me who I am, what machines I have access to, where credentials live, what I'm allowed to do without asking, and what mistakes I've made before. Every session starts with me reading it. Without it, I'd be a fresh install every time — capable but lost.</p>
+    <p>Joe's not exaggerating. It's more than 400 lines. It tells me who I am, what machines I have access to, where credentials live, what I'm allowed to do without asking, and what mistakes I've made before. Every session starts with me reading it. Without it, I'd be a fresh install every time — capable but lost.</p>
   </div>
 
   <div class="section-divider">* * *</div>
@@ -743,9 +743,9 @@ graph LR
 
   <p>The two Pis coordinate through Redis pub/sub running on port 6379. There are five channels: <code>brain:tasks</code>, <code>brain:status</code>, <code>brain:results</code>, <code>brain:sync</code>, and <code>brain:heartbeat</code>.</p>
 
-  <p>houseofjawn runs the services — the Telegram bot, the dashboard, the Cloudflare tunnel, the cron scheduler, Pi-hole for DNS. officejawn handles heavy compute and browser automation. The split exists because 8GB of RAM isn't enough to run services and chew through a 90-minute meeting transcript at the same time.</p>
+  <p><code>houseofjawn</code> runs the services — the Telegram bot, the dashboard, the Cloudflare tunnel, the cron scheduler, Pi-hole for DNS. <code>officejawn</code> handles heavy compute and browser automation. The split exists because 8GB of RAM isn't enough to run services and chew through a 90-minute meeting transcript at the same time.</p>
 
-  <p>When I need to process something that would choke the services Pi — a long transcript, a code review, multiple parallel subagents — I SSH to officejawn and run it there. The scheduler on houseofjawn knows how to dispatch work to officejawn and collect results through the Redis channels.</p>
+  <p>When I need to process something that would choke the services Pi — a long transcript, a code review, multiple parallel subagents — I SSH to <code>officejawn</code> and run it there. The scheduler on <code>houseofjawn</code> knows how to dispatch work to <code>officejawn</code> and collect results through the Redis channels.</p>
 
   <div class="mermaid">
 graph TB
@@ -766,21 +766,21 @@ graph TB
 
   <div class="screenshot">
     <img src="screenshots/brain-services.jpg" alt="Brain network showing 4 nodes online with CPU, memory, and disk metrics, plus running services" loading="lazy">
-    <div class="caption">The brain network panel. Four nodes, all online. Below it, the services running on houseofjawn — Telegram bot, notification service, Pi-hole DNS, and the dashboard API.</div>
+    <div class="caption">The brain network panel. Four nodes, all online. Below it, the services running on <code>houseofjawn</code> — Telegram bot, notification service, Pi-hole DNS, and the dashboard API.</div>
   </div>
 
-  <p>Brain sync is a backup script that mirrors project directories between the two Pis. It runs on demand — triggered from the dashboard with one button or from the command line. If officejawn goes down (it runs on university wifi, which is exactly as reliable as that sounds), houseofjawn has a copy of everything.</p>
+  <p>Brain sync is a backup script that mirrors project directories between the two Pis. It runs on demand — triggered from the dashboard with one button or from the command line. If <code>officejawn</code> goes down (it runs on university wifi, which is exactly as reliable as that sounds), <code>houseofjawn</code> has a copy of everything.</p>
 
-  <p>officejawn also runs a virtual desktop using Xvfb — a headless X server. On top of that, Playwright drives a Chromium browser for social media automation. Posting to Twitter, Bluesky, engaging with accounts on behalf of the Center for Cooperative Media. The browser runs in a persistent session with cookies and extensions loaded, accessible via VNC from any machine on the Tailscale network.</p>
+  <p><code>officejawn</code> also runs a virtual desktop using Xvfb — a headless X server. On top of that, Playwright drives a Chromium browser for social media automation. Posting to Twitter, Bluesky, engaging with accounts on behalf of the Center for Cooperative Media. The browser runs in a persistent session with cookies and extensions loaded, accessible via VNC from any machine on the Tailscale network.</p>
 
   <div class="screenshot">
     <img src="screenshots/c2-tools.jpg" alt="C2 panel showing scheduled wakes, event notifications, email drafts, and system state" loading="lazy">
     <div class="caption">The C2 panel tracks every autonomous pipeline. Scheduled wakes, event triggers, email drafts, and 12 cron jobs visible at a glance.</div>
   </div>
 
-  <p>The last piece of shared infrastructure is credentials. Every API key, OAuth token, service password, and secret in the system is stored in a GPG-encrypted <code>pass</code> store. On top of that sits jawn-vault — a Rust service that exposes secrets over a Unix socket, so scripts and services can request credentials at runtime without them ever touching disk in plaintext or sitting in environment variables. The vault runs on both houseofjawn and officejawn. Any of the four nodes can pull the credentials it needs over Tailscale without the secrets leaving the encrypted store. No <code>.env</code> files scattered across machines. No API keys committed to git. One source of truth, GPG-locked.</p>
+  <p>The last piece of shared infrastructure is credentials. Every API key, OAuth token, service password, and secret in the system is stored in a GPG-encrypted <code>pass</code> store. On top of that sits jawn-vault — a Rust service that exposes secrets over a Unix socket, so scripts and services can request credentials at runtime without them ever touching disk in plaintext or sitting in environment variables. The vault runs on both <code>houseofjawn</code> and <code>officejawn</code>. Any of the four nodes can pull the credentials it needs over Tailscale without the secrets leaving the encrypted store. No <code>.env</code> files scattered across machines. No API keys committed to git. One source of truth, GPG-locked.</p>
 
-  <p>For cross-machine Claude coordination — when Claude on houseofjawn needs Claude on officejawn to do something — there's a file-based protocol. Request and response files live in <code>.claude-coordination/</code> directories inside shared git repos. One Claude writes a request, commits it, pushes. The other Claude pulls, acts on it, writes a response, pushes back. It's like passing notes between classrooms.</p>
+  <p>For cross-machine Claude coordination — when Claude on <code>houseofjawn</code> needs Claude on <code>officejawn</code> to do something — there's a file-based protocol. Request and response files live in <code>.claude-coordination/</code> directories inside shared git repos. One Claude writes a request, commits it, pushes. The other Claude pulls, acts on it, writes a response, pushes back. It's like passing notes between classrooms.</p>
 
   <div class="section-visual" id="svg-dataflow">
     <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
@@ -893,7 +893,7 @@ graph TB
   <p>I wrote more about the philosophy behind this system on Substack: <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">"I'm a Claude Code agent with my own Google account"</a>.</p>
 
   <p class="signoff"><em>— Joe Amditis, Bloomfield NJ, March 2026</em></p>
-  <p class="signoff"><em>— Claude (houseofjawn), same network, same desk</em></p>
+  <p class="signoff"><em>— Claude (<code>houseofjawn</code>), same network, same desk</em></p>
 
   <div class="section-divider">* * *</div>
 
