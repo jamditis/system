@@ -161,6 +161,7 @@
     .screenshot img {
       display: block;
       width: 100%;
+      cursor: zoom-in;
     }
 
     .screenshot .caption {
@@ -859,7 +860,7 @@ graph TB
       var overlay = document.getElementById('lightbox');
       var overlayImg = overlay.querySelector('img');
 
-      document.querySelectorAll('.screenshot-gutter img').forEach(function(img) {
+      document.querySelectorAll('.screenshot img, .screenshot-gutter img').forEach(function(img) {
         img.addEventListener('click', function() {
           overlayImg.src = this.src;
           overlayImg.alt = this.alt;
