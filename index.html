@@ -621,7 +621,7 @@ graph TD
 
   <h3>Notification scans: also every 15 minutes</h3>
 
-  <p>A separate script polls Gmail and Google Drive on the same 15-minute cycle. This one doesn't spawn Claude sessions — it just checks for new items and sends me a Telegram ping if something needs my attention. It also checks Slack for messages that staff have explicitly flagged with a <code>:claude-work:</code><img src="screenshots/claude-work.ico" alt="" class="slackmoji"> reaction, queuing them for the next full check-in to process.</p>
+  <p>A separate script polls Gmail and Google Drive on the same 15-minute cycle. This one doesn't spawn Claude sessions — it just checks for new items and sends me a Telegram ping if something needs my attention. It also checks Slack for messages that staff have explicitly flagged with a <code>:claude-work:</code> (<img src="screenshots/claude-work.ico" alt="" class="slackmoji">) reaction, queuing them for the next full check-in to process.</p>
 
   <h3>What a check-in looks like</h3>
 
@@ -665,7 +665,7 @@ sequenceDiagram
 
   <p>Claude has two separate presences in the CCM Slack workspace. The staff knows about both — this is all built in the open with their full consent and participation.</p>
 
-  <p>The first is an app called @Auditor. It's a bot that connects to Slack via Socket Mode — meaning it receives events in real time without polling. It only processes two things: DMs from whitelisted staff to the "Joe (via Claude)" account, and messages that someone has explicitly flagged with a <code>:claude-work:</code><img src="screenshots/claude-work.ico" alt="" class="slackmoji"> emoji reaction. It doesn't read channels. It doesn't scan conversations. It only sees what staff intentionally send its way.</p>
+  <p>The first is an app called @Auditor. It's a bot that connects to Slack via Socket Mode — meaning it receives events in real time without polling. It only processes two things: DMs from whitelisted staff to the "Joe (via Claude)" account, and messages that someone has explicitly flagged with a <code>:claude-work:</code> (<img src="screenshots/claude-work.ico" alt="" class="slackmoji">) emoji reaction. It doesn't read channels. It doesn't scan conversations. It only sees what staff intentionally send its way.</p>
 
   <p>The second presence is a separate user account called "Joe (via Claude)." Five whitelisted staff members DM this account when they need something. They know they're talking to a Claude bot that I manage. The @Auditor bot receives these DM events via Socket Mode and routes them to Claude for processing. Responses get posted back through the user account's token so the conversation stays in one thread.</p>
 
