@@ -186,6 +186,31 @@
     .screenshot-gutter img {
       display: block;
       width: 100%;
+      cursor: zoom-in;
+    }
+
+    /* Lightbox overlay for gutter images */
+    .lightbox-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.85);
+      cursor: zoom-out;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .lightbox-overlay.active {
+      display: flex;
+    }
+
+    .lightbox-overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5);
     }
 
     .screenshot-gutter .caption {
@@ -352,7 +377,7 @@
   <p class="byline">By Joe Amditis and Claude</p>
   <p style="font-size: 0.85rem; color: #888; margin-top: -1rem;">March 2026 · Updated from the <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">original Substack post</a></p>
 
-  <p>I have a Claude Code agent that runs on Raspberry Pi hardware. It checks my email, monitors Slack, processes meeting transcripts, manages a project board, and sends me Telegram messages when something needs my attention. It does this on its own, on a schedule, without me asking. It has its own Google account, its own memory files, and its own accumulated history of screwups it's learned not to repeat.</p>
+  <p>I have a Claude Code agent that runs on Raspberry Pi hardware. It checks my email, processes meeting transcripts, manages a project board, responds to coworkers who DM it on Slack, and sends me Telegram messages when something needs my attention. It does this on its own, on a schedule, without me asking. It has its own Google account, its own memory files, and its own accumulated history of screwups it's learned not to repeat.</p>
 
   <p>I named it Claude Chode because naming things is my worst skill and I thought it was funny at 2am. It stuck.</p>
 
@@ -457,7 +482,7 @@ graph TD
 
   <h3>Full check-ins: every 2 hours</h3>
 
-  <p>Six times a day, weekdays only, from 7am to 5pm Eastern: Claude boots up with a context-aware prompt. Morning sessions focus on planning — what's on the calendar, what emails came in overnight, what's pending on the project board. Midday sessions focus on progress — following up on tasks, processing new transcripts, monitoring Slack. The 5pm session wraps things up and logs a summary.</p>
+  <p>Six times a day, weekdays only, from 7am to 5pm Eastern: Claude boots up with a context-aware prompt. Morning sessions focus on planning — what's on the calendar, what emails came in overnight, what's pending on the project board. Midday sessions focus on progress — following up on tasks, processing new transcripts, checking for Slack messages that staff have flagged. The 5pm session wraps things up and logs a summary.</p>
 
   <p>Each check-in spawns a full Claude Code session inside a tmux window. The scheduler script writes the prompt, sets a timeout, and captures the output. If Claude doesn't finish in time, the session gets killed. If it crashes, the error gets logged and the next scheduled run picks up where things left off.</p>
 
@@ -558,7 +583,7 @@ graph TD
 
   <h3>Notification scans: also every 15 minutes</h3>
 
-  <p>A separate script polls Gmail, Google Drive, and Slack on the same 15-minute cycle. This one doesn't spawn Claude sessions — it just checks for new items and sends me a Telegram ping if something needs my attention. It also monitors Slack for @mentions and flagged messages, queuing them for the next full check-in to process.</p>
+  <p>A separate script polls Gmail and Google Drive on the same 15-minute cycle. This one doesn't spawn Claude sessions — it just checks for new items and sends me a Telegram ping if something needs my attention. It also checks Slack for messages that staff have explicitly flagged with a <code>:claude-work:</code> reaction, queuing them for the next full check-in to process.</p>
 
   <h3>What a check-in looks like</h3>
 
@@ -578,7 +603,7 @@ sequenceDiagram
     Scheduler->>Scheduler: check state file
     Scheduler->>Claude: spawn tmux session
     Claude->>Claude: read CLAUDE.md + memory
-    Claude->>Services: check email, Slack, transcripts
+    Claude->>Services: check email, flagged Slack, transcripts
     Claude->>Claude: categorize + process
     Claude->>Joe: Telegram summary
     Claude->>Services: log to Board + CRM
@@ -602,7 +627,7 @@ sequenceDiagram
 
   <p>Claude has two separate presences in the CCM Slack workspace. The staff knows about both — this is all built in the open with their full consent and participation.</p>
 
-  <p>The first is an app called @Auditor. It's a bot that connects to Slack via Socket Mode — meaning it receives events in real time without polling. It watches for DMs, @mentions, and flagged messages. But @Auditor never responds to anyone. It's a listener.</p>
+  <p>The first is an app called @Auditor. It's a bot that connects to Slack via Socket Mode — meaning it receives events in real time without polling. It only processes two things: DMs from whitelisted staff to the "Joe (via Claude)" account, and messages that someone has explicitly flagged with a <code>:claude-work:</code> emoji reaction. It doesn't read channels. It doesn't scan conversations. It only sees what staff intentionally send its way.</p>
 
   <p>The second presence is a separate user account called "Joe (via Claude)." Five whitelisted staff members DM this account when they need something. They know they're talking to a Claude bot that I manage. The @Auditor bot receives these DM events via Socket Mode and routes them to Claude for processing. Responses get posted back through the user account's token so the conversation stays in one thread.</p>
 
@@ -799,7 +824,7 @@ graph TB
     </tbody>
   </table>
 
-  <p>The real difference isn't technical — it's about who the system serves. Wang optimized for a single person's productivity. One user, one machine, tight feedback loops. Our system was built for an organization: the Center for Cooperative Media, a team of about 10 people running programs, events, and a news service. Claude monitors shared Slack channels, processes meeting transcripts from multiple staff members, tracks contacts and interactions across the whole team. Different goals, different architectures. Both cost about the same as a decent office chair.</p>
+  <p>The real difference isn't technical — it's about who the system serves. Wang optimized for a single person's productivity. One user, one machine, tight feedback loops. Our system was built for an organization: the Center for Cooperative Media, a team of about 10 people running programs, events, and a news service. Claude responds to flagged Slack messages from staff, processes meeting transcripts from multiple people, tracks contacts and interactions across the whole team. Different goals, different architectures. Both cost about the same as a decent office chair.</p>
 
   <div class="section-divider">* * *</div>
 
@@ -808,7 +833,7 @@ graph TB
 
   <p>Here's the journalism angle, since that's the world I come from: a $160 computer can now run an autonomous assistant for a journalism support organization funded by foundation grants and housed at a public university.</p>
 
-  <p>The Center for Cooperative Media is a 10-person team. We support newsrooms, coordinate collaborative reporting projects, run events and training programs, manage partnerships. The operational overhead — tracking contacts, following up on action items, processing meeting transcripts, monitoring Slack — used to eat hours every week. Claude handles that now. Nobody lost work. The team got time back.</p>
+  <p>The Center for Cooperative Media is a 10-person team. We support newsrooms, coordinate collaborative reporting projects, run events and training programs, manage partnerships. The operational overhead — tracking contacts, following up on action items, processing meeting transcripts, responding to flagged Slack messages — used to eat hours every week. Claude handles that now. Nobody lost work. The team got time back.</p>
 
   <p>The entire system — four machines, all the software, everything described in this post — cost less than one month of a typical SaaS CRM subscription. The dashboard alone replaced tools we were paying for. The bot and dashboard repos are private for now (they contain org-specific configuration), but the architecture is documented in this post and the <a href="https://centerforcooperativemedia.org/claudechode-manual.html">technical manual</a>. If you want to build something similar, everything you need to know is here.</p>
 
@@ -824,5 +849,36 @@ graph TB
   <footer style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e0e0e0; font-size: 0.85rem; color: #888;">
     <p>Built with Claude Code on a Raspberry Pi 5. Source: <a href="https://github.com/jamditis/system">github.com/jamditis/system</a></p>
   </footer>
+
+  <div class="lightbox-overlay" id="lightbox">
+    <img src="" alt="">
+  </div>
+
+  <script>
+    (function() {
+      var overlay = document.getElementById('lightbox');
+      var overlayImg = overlay.querySelector('img');
+
+      document.querySelectorAll('.screenshot-gutter img').forEach(function(img) {
+        img.addEventListener('click', function() {
+          overlayImg.src = this.src;
+          overlayImg.alt = this.alt;
+          overlay.classList.add('active');
+        });
+      });
+
+      overlay.addEventListener('click', function() {
+        overlay.classList.remove('active');
+        overlayImg.src = '';
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+          overlay.classList.remove('active');
+          overlayImg.src = '';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
