@@ -1,6 +1,6 @@
 # Claude Chode
 
-An autonomous Claude Code system running on $600 of Raspberry Pi hardware.
+An autonomous Claude Code system running on $700 of Raspberry Pi hardware.
 
 **Live at:** [system.amditis.tech](https://system.amditis.tech)
 
@@ -30,8 +30,9 @@ Single self-contained HTML page. No build step, no framework.
 
 - [The original Substack post](https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own) (February 2026)
 - [Brandon Wang's OpenClaw post](https://brandon.wang/2026/clawdbot) (inspiration)
-- [houseofjawn-bot](https://github.com/jamditis/houseofjawn-bot) (the Telegram bot and scheduler)
-- [houseofjawn-dashboard](https://github.com/jamditis/houseofjawn-dashboard) (the mission control dashboard)
+- [Technical manual](https://centerforcooperativemedia.org/claudechode-manual.html) (full system reference)
+- houseofjawn-bot (the Telegram bot and scheduler — private repo)
+- houseofjawn-dashboard (the mission control dashboard — private repo)
 
 ## License
 
