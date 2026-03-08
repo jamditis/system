@@ -605,7 +605,7 @@ graph LR
   <p>It lives at <code>pi.amditis.tech</code>, accessible through a Cloudflare Tunnel. The stack is React 19 and Vite on the frontend, FastAPI and SQLite on the backend, with Socket.io for real-time updates. It's the single pane of glass for the entire system.</p>
 
   <div class="screenshot">
-    <img src="screenshots/dashboard-overview.png" alt="Dashboard showing system metrics, brain network status, and service health" loading="lazy">
+    <img src="screenshots/dashboard-overview.jpg" alt="Dashboard showing system metrics, brain network status, and service health" loading="lazy">
     <div class="caption">The main dashboard showing system metrics across all nodes, with the brain network status at the bottom.</div>
   </div>
 
@@ -616,7 +616,7 @@ graph LR
   <p>Before the Board existed, Claude would summarize tasks in Telegram messages that I'd read once and forget. Now everything is tracked. I can filter by source (email, transcript, Slack), by priority, by status. If someone asks me "did you follow up on that thing from last week's meeting," I can search the Board instead of scrolling through Telegram.</p>
 
   <div class="screenshot">
-    <img src="screenshots/kanban-board.png" alt="Kanban board with backlog, in progress, review, and done columns" loading="lazy">
+    <img src="screenshots/kanban-board.jpg" alt="Kanban board with backlog, in progress, review, and done columns" loading="lazy">
     <div class="caption">The Board tracks everything Claude works on. 323 items and counting.</div>
   </div>
 
@@ -627,7 +627,7 @@ graph LR
   <p>When Claude processes a meeting transcript that mentions a new person, it creates a contact entry and logs the interaction. Over time, the graph fills in. It's not a replacement for a real CRM — it's a memory aid that gets populated automatically.</p>
 
   <div class="screenshot">
-    <img src="screenshots/network-graph.png" alt="Force-directed network graph showing contacts, organizations, and their relationships" loading="lazy">
+    <img src="screenshots/network-graph.jpg" alt="Force-directed network graph showing contacts, organizations, and their relationships" loading="lazy">
     <div class="caption">The CRM relationship graph. Each dot is a contact or organization. Lines show affiliations and shared program participation.</div>
   </div>
 
@@ -669,12 +669,17 @@ graph TB
     houseofjawn <-->|"Redis pub/sub<br/>5 channels"| officejawn
   </div>
 
+  <div class="screenshot">
+    <img src="screenshots/brain-services.jpg" alt="Brain network showing 4 nodes online with CPU, memory, and disk metrics, plus running services" loading="lazy">
+    <div class="caption">The brain network panel. Four nodes, all online. Below it, the services running on houseofjawn — Telegram bot, notification service, Pi-hole DNS, and the dashboard API.</div>
+  </div>
+
   <p>Brain sync is a backup script that mirrors project directories between the two Pis. It runs on demand — triggered from the dashboard with one button or from the command line. If officejawn goes down (it runs on university wifi, which is exactly as reliable as that sounds), houseofjawn has a copy of everything.</p>
 
   <p>officejawn also runs a virtual desktop using Xvfb — a headless X server. On top of that, Playwright drives a Chromium browser for social media automation. Posting to Twitter, Bluesky, engaging with accounts on behalf of the Center for Cooperative Media. The browser runs in a persistent session with cookies and extensions loaded, accessible via VNC from any machine on the Tailscale network.</p>
 
   <div class="screenshot">
-    <img src="screenshots/c2-tools.png" alt="C2 panel showing scheduled wakes, event notifications, email drafts, and system state" loading="lazy">
+    <img src="screenshots/c2-tools.jpg" alt="C2 panel showing scheduled wakes, event notifications, email drafts, and system state" loading="lazy">
     <div class="caption">The C2 panel tracks every autonomous pipeline. Scheduled wakes, event triggers, email drafts, and 12 cron jobs visible at a glance.</div>
   </div>
 
