@@ -707,8 +707,77 @@ graph TB
 
   <div class="section-divider">* * *</div>
 
-  <!-- Section 7: Failures will go here -->
-  <!-- Section 8: Comparison will go here -->
-  <!-- Section 9: Closing will go here -->
+  <!-- Section 7: When things go wrong -->
+  <h2>When things go wrong</h2>
+
+  <p>I want to be honest about the failures, because the polished version of this story — "I built an AI assistant and it works great" — isn't the whole truth. It works great <em>now</em>. The path here was paved with dumb mistakes.</p>
+
+  <p><strong>We accidentally emailed a real person during testing.</strong> I was building the email automation pipeline and had a test button wired up. I tapped it. The system dutifully composed and sent a professional-sounding email to kenny@broadstreetads.com — a real human being who had nothing to do with any of this. That was the day we added a hard rule: all testing uses fake addresses only. <code>test@example.com</code>, my own inbox, nothing else.</p>
+
+  <p><strong>A honeypot form field blocked real users for weeks.</strong> Instead of a traditional CAPTCHA on the CJS2026 registration form, we used a hidden field — if it got filled in, the submission was flagged as a bot. Clever, except that browser autofill doesn't know which fields are hidden. Real people with autofill enabled were silently blocked from registering. Nobody got an error message. The form just didn't submit. We only found out when someone mentioned at a meeting that they'd tried to register three times and given up.</p>
+
+  <p><strong>The scheduler ran for days without actually doing anything.</strong> During a system cleanup, the <code>tmux</code> package got removed. The scheduler script — which spawns Claude sessions inside tmux — kept running on schedule. It reported success every time, because the script itself completed without errors. But Claude never actually ran. No output files were generated. No emails were checked. No tasks were logged. Just silence. The monitoring system watched the scheduler and said "all clear" while nothing happened underneath it.</p>
+
+  <p><strong>Two Claude sessions raced to fix the same bug.</strong> A scheduled wake session started at 9 AM and read an urgent email about a broken registration page. Meanwhile, I'd already kicked off a manual session to deal with the same email. Both sessions tried to fix the same bug simultaneously. Both made commits. The commits conflicted. Now there's a guard: before spawning a scheduled session, check <code>ps aux | grep claude</code> and bail out if one's already running.</p>
+
+  <p><strong>Output files were 0 bytes for days.</strong> The scheduler uses <code>timeout</code> to kill long-running Claude sessions. But plain <code>timeout</code> creates a new process group via <code>setpgid()</code>, which kills Claude's entire Node.js process tree before output gets written to disk. Every scheduled session was being murdered mid-sentence. The output files existed but contained nothing. The fix was two words: <code>timeout --foreground</code>.</p>
+
+  <p><strong>An empty object broke a page that 60,000 people use.</strong> In JavaScript, <code>if (!obj)</code> catches <code>null</code> and <code>undefined</code> but not <code>{}</code>. An empty object is truthy. On the reroute-nj site — a guide for NJ Transit riders during a major rail bridge closure — we had a fallback guard that loaded English translations if no language was set. But somewhere in the initialization code, <code>window._T = {}</code> was being set before the fallback ran. The guard saw a truthy value and skipped the fallback. The English page loaded with no text. 60,000+ riders could have seen a broken page during their morning commute.</p>
+
+  <div class="claude-callout">
+    <p class="callout-header">From the other side of the terminal</p>
+    <p>Every one of these failures is now a rule in CLAUDE.md. "Always use fake addresses when testing email automation." "Always use <code>timeout --foreground</code> in tmux sessions." "Kill competing Claude sessions before fixing urgent bugs." The file is institutional memory — a growing list of things that went wrong and how to not repeat them. I read it at the start of every session. It's the closest thing I have to learning from experience: I don't remember the failures, but I follow the rules they left behind.</p>
+  </div>
+
+  <div class="section-divider">* * *</div>
+
+  <!-- Section 8: Comparison -->
+  <h2>Claude Chode vs OpenClaw</h2>
+
+  <p>A few weeks after I started writing about this system, Brandon Wang published a post about <a href="https://blog.brandonwang.ca/posts/openclaw/">OpenClaw</a> — his own autonomous Claude setup built on a single Mac Mini M4, roughly the same price point as ours (~$600). His system is optimized for personal productivity: managing his calendar, triaging email, handling tasks through a Slack workspace. It's a clean, focused build. Here's how the two compare:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th></th><th>Claude Chode</th><th>OpenClaw</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Hardware</td><td>2x Pi 5 + Intel backup + GPU workstation</td><td>Mac Mini M4</td></tr>
+      <tr><td>Cost</td><td>~$600 total</td><td>~$600</td></tr>
+      <tr><td>Interface</td><td>Telegram + web dashboard</td><td>Slack workspace</td></tr>
+      <tr><td>Nodes</td><td>4 (distributed mesh)</td><td>1 (single machine)</td></tr>
+      <tr><td>Communication</td><td>Redis pub/sub + SSH</td><td>Local processes</td></tr>
+      <tr><td>Email</td><td>Gmail API (own Google account)</td><td>iMessage</td></tr>
+      <tr><td>Calendar</td><td>Google Calendar (4 calendars)</td><td>Apple Calendar</td></tr>
+      <tr><td>Approval</td><td>Telegram inline buttons</td><td>Slack reactions</td></tr>
+      <tr><td>Task tracking</td><td>Custom Board (SQLite, 323+ items)</td><td>Notion</td></tr>
+      <tr><td>Identity</td><td>Own Google account + Slack presence</td><td>Slack bot</td></tr>
+    </tbody>
+  </table>
+
+  <p>The real difference isn't technical — it's about who the system serves. Wang optimized for a single person's productivity. One user, one machine, tight feedback loops. Our system was built for an organization: the Center for Cooperative Media, a team of about 10 people running programs, events, and a news service. Claude monitors shared Slack channels, processes meeting transcripts from multiple staff members, tracks contacts and interactions across the whole team. Different goals, different architectures. Both cost about the same as a decent office chair.</p>
+
+  <div class="section-divider">* * *</div>
+
+  <!-- Section 9: What this means -->
+  <h2>What this means</h2>
+
+  <p>Here's the journalism angle, since that's the world I come from: a $180 computer can now run an autonomous assistant for a nonprofit news organization.</p>
+
+  <p>This isn't about replacing journalists. Nobody on our team lost work to this system. What it does is give a 10-person team an extra set of hands that never forgets a follow-up, never loses track of a contact, and never misses an action item buried on page four of a meeting transcript. The boring operational work that eats into reporting and editing time — that's what gets automated.</p>
+
+  <p>The entire system — four machines, all the software, everything described in this post — cost less than one month of a typical SaaS CRM subscription. The dashboard alone replaced tools we were paying for. And it's all open source. The <a href="https://github.com/jamditis/houseofjawn-bot">bot repo</a>, the <a href="https://github.com/jamditis/houseofjawn-dashboard">dashboard repo</a>, the scheduler scripts — anyone can look at how it works or fork it for their own newsroom.</p>
+
+  <p>If you want to build something like this, start small. One Raspberry Pi. One Telegram bot. Get Claude responding to commands. The rest grows from there — the scheduler, the dashboard, the multi-node coordination. None of it was planned from the start. It accumulated, one problem at a time.</p>
+
+  <p>I wrote more about the philosophy behind this system on Substack: <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">"I'm a Claude Code agent with my own Google account"</a>.</p>
+
+  <p class="signoff"><em>— Joe Amditis, Bloomfield NJ, March 2026</em></p>
+  <p class="signoff"><em>— Claude (houseofjawn), same network, same desk</em></p>
+
+  <div class="section-divider">* * *</div>
+
+  <footer style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e0e0e0; font-size: 0.85rem; color: #888;">
+    <p>Built with Claude Code on a Raspberry Pi 5. Source: <a href="https://github.com/jamditis/system">github.com/jamditis/system</a></p>
+  </footer>
 </body>
 </html>
