@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claude Chode — an autonomous Claude Code system</title>
-  <meta name="description" content="How a journalist built an autonomous AI assistant on $600 of Raspberry Pi hardware. Architecture, failures, and lessons from running Claude Code across a 4-node mesh network.">
+  <meta name="description" content="How a journalist built an autonomous AI assistant on $700 of Raspberry Pi hardware. Architecture, failures, and lessons from running Claude Code across a 4-node mesh network.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta property="og:title" content="Claude Chode — an autonomous Claude Code system">
-  <meta property="og:description" content="How a journalist built an autonomous AI assistant on $600 of Raspberry Pi hardware.">
+  <meta property="og:description" content="How a journalist built an autonomous AI assistant on $700 of Raspberry Pi hardware.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://system.amditis.tech">
   <meta property="og:image" content="https://system.amditis.tech/og-image.png">
@@ -15,7 +15,7 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Claude Chode — an autonomous Claude Code system">
-  <meta name="twitter:description" content="How a journalist built an autonomous AI assistant on $600 of Raspberry Pi hardware.">
+  <meta name="twitter:description" content="How a journalist built an autonomous AI assistant on $700 of Raspberry Pi hardware.">
   <meta name="twitter:image" content="https://system.amditis.tech/og-image.png">
   <style>
     /* === Base layout === */
@@ -311,7 +311,7 @@
 </head>
 <body>
   <h1>Claude Chode</h1>
-  <p class="subtitle">An autonomous Claude Code system on $600 of Raspberry Pi hardware</p>
+  <p class="subtitle">An autonomous Claude Code system on $700 of Raspberry Pi hardware</p>
   <p class="byline">By Joe Amditis and Claude</p>
   <p style="font-size: 0.85rem; color: #888; margin-top: -1rem;">March 2026 · Updated from the <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">original Substack post</a></p>
 
@@ -392,7 +392,7 @@
 
   <p><strong>landofjawn</strong> is an Intel N95 mini PC at my brother's house in Pennsylvania. It's the backup node. Offsite storage, redundancy. It doesn't do much day-to-day, but it's there.</p>
 
-  <p><strong>legion2025</strong> is a desktop with an RTX 4080 Super GPU. It runs Windows. It sleeps most of the time and wakes up on demand via Wake-on-LAN when Claude needs GPU compute. I already had the machine — the GPU card was the only purchase.</p>
+  <p><strong>legion2025</strong> is a Lenovo prebuilt with an i9-14900KF, 32GB of RAM, and an RTX 4080 Super. It runs Windows. It sleeps most of the time and wakes up on demand via Wake-on-LAN when Claude needs GPU compute. I bought it as a personal work and gaming desktop in April 2025 — it predates this whole project.</p>
 
   <div class="mermaid">
 graph TD
@@ -401,7 +401,7 @@ graph TD
     HOJ -->|"WoL + WinRM"| LEG["legion2025<br/><small>RTX 4080 · GPU</small>"]
   </div>
 
-  <p>Total hardware cost: about $600. Two Pis at $80 each. The N95 mini PC was around $150. The GPU card was roughly $300 — but I already owned the desktop it went into, so your mileage may vary. Either way, it's a fraction of what a cloud deployment would cost.</p>
+  <p>Total hardware cost for the dedicated nodes: about $688. The Pi 5 with 8GB (houseofjawn) was $160. The Pi 5 with 16GB (officejawn) was $300. The Intel N95 mini PC was $228. The Legion desktop was $2,735 but I bought that independently as a personal machine — it just happens to moonlight as a GPU worker when Claude needs it.</p>
 
   <p>Wang runs everything on a single Mac Mini. I spread it across four machines because I like making things harder for myself. There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But I had the hardware sitting around, and splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
 
@@ -739,7 +739,7 @@ graph TB
   <!-- Section 8: Comparison -->
   <h2>Claude Chode vs OpenClaw</h2>
 
-  <p>A few weeks after I started writing about this system, Brandon Wang published a post about <a href="https://blog.brandonwang.ca/posts/openclaw/">OpenClaw</a> — his own autonomous Claude setup built on a single Mac Mini M4, roughly the same price point as ours (~$600). His system is optimized for personal productivity: managing his calendar, triaging email, handling tasks through a Slack workspace. It's a clean, focused build. Here's how the two compare:</p>
+  <p>A few weeks after I started writing about this system, Brandon Wang published a post about <a href="https://blog.brandonwang.ca/posts/openclaw/">OpenClaw</a> — his own autonomous Claude setup built on a single Mac Mini M4, roughly the same price point as ours (~$700). His system is optimized for personal productivity: managing his calendar, triaging email, handling tasks through a Slack workspace. It's a clean, focused build. Here's how the two compare:</p>
 
   <table class="comparison-table">
     <thead>
@@ -747,7 +747,7 @@ graph TB
     </thead>
     <tbody>
       <tr><td>Hardware</td><td>2x Pi 5 + Intel backup + GPU workstation</td><td>Mac Mini M4</td></tr>
-      <tr><td>Cost</td><td>~$600 total</td><td>~$600</td></tr>
+      <tr><td>Cost</td><td>~$688</td><td>~$600</td></tr>
       <tr><td>Interface</td><td>Telegram + web dashboard</td><td>Slack workspace</td></tr>
       <tr><td>Nodes</td><td>4 (distributed mesh)</td><td>1 (single machine)</td></tr>
       <tr><td>Communication</td><td>Redis pub/sub + SSH</td><td>Local processes</td></tr>
@@ -766,7 +766,7 @@ graph TB
   <!-- Section 9: What this means -->
   <h2>What this means</h2>
 
-  <p>Here's the journalism angle, since that's the world I come from: a $180 computer can now run an autonomous assistant for a nonprofit news organization.</p>
+  <p>Here's the journalism angle, since that's the world I come from: a $160 computer can now run an autonomous assistant for a nonprofit news organization.</p>
 
   <p>This isn't about replacing journalists. Nobody on our team lost work to this system. What it does is give a 10-person team an extra set of hands that never forgets a follow-up, never loses track of a contact, and never misses an action item buried on page four of a meeting transcript. The boring operational work that eats into reporting and editing time — that's what gets automated.</p>
 
