@@ -34,11 +34,16 @@
       font-weight: 800;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     h2 {
       margin-top: 2.5rem;
       font-size: 1.5rem;
       padding-bottom: 0.5rem;
       border-bottom: 1px solid #e0e0e0;
+      scroll-margin-top: 3.5rem;
     }
 
     h3 {
@@ -386,8 +391,130 @@
       }
     }
 
+    /* === Sticky nav === */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0.5rem 1rem;
+      margin: -2rem -1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+    }
+
+    .site-nav a {
+      color: #555;
+      text-decoration: none;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .site-nav a:hover {
+      background: #f3f4f6;
+      color: #0d9488;
+    }
+
+    .site-nav .nav-sep {
+      color: #ccc;
+      margin: 0 0.15rem;
+      user-select: none;
+    }
+
+    .site-nav .nav-external {
+      margin-left: auto;
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .site-nav .nav-external a {
+      color: #0d9488;
+      font-weight: 600;
+    }
+
+    /* === Support strip === */
+    .support-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .support-strip a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .support-strip a:hover {
+      transform: translateY(-1px);
+      color: #fff;
+    }
+
+    .support-strip .s-venmo { background: #0068c9; }
+    .support-strip .s-venmo:hover { box-shadow: 0 4px 14px rgba(0, 140, 255, 0.4); }
+    .support-strip .s-paypal { background: #003087; }
+    .support-strip .s-paypal:hover { box-shadow: 0 4px 14px rgba(0, 48, 135, 0.4); }
+    .support-strip .s-github { background: #333; }
+    .support-strip .s-github:hover { box-shadow: 0 4px 14px rgba(51, 51, 51, 0.4); }
+    .support-strip .s-substack { background: #ff6719; }
+    .support-strip .s-substack:hover { box-shadow: 0 4px 14px rgba(255, 103, 25, 0.4); }
+    .support-strip svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* === Site footer === */
+    .site-footer {
+      margin-top: 3rem;
+      padding: 2rem 0 1rem;
+      border-top: 1px solid #e0e0e0;
+      font-size: 0.85rem;
+      color: #888;
+      text-align: center;
+    }
+
+    .site-footer p {
+      margin: 0.5rem 0;
+    }
+
+    .site-footer .support-strip {
+      margin: 1.5rem 0;
+    }
+
+    /* === Dark mode additions === */
+    @media (prefers-color-scheme: dark) {
+      .site-nav {
+        background: rgba(10, 10, 10, 0.85);
+        border-bottom-color: #333;
+      }
+
+      .site-nav a { color: #999; }
+      .site-nav a:hover { background: #1a1a1a; color: #5eead4; }
+      .site-nav .nav-sep { color: #444; }
+      .site-nav .nav-external a { color: #5eead4; }
+
+      .site-footer { border-top-color: #333; }
+      .support-strip .s-github { background: #555; }
+    }
+
     /* === Print === */
     @media print {
+      .site-nav { display: none; }
+
       .claude-callout {
         border: 1px solid #ccc;
       }
@@ -396,6 +523,32 @@
         max-height: 300px;
       }
     }
+
+    /* === Responsive nav === */
+    @media (max-width: 600px) {
+      .site-nav {
+        font-size: 0.7rem;
+        gap: 0.25rem;
+        padding: 0.4rem 0.75rem;
+      }
+
+      .site-nav a {
+        padding: 0.2rem 0.35rem;
+      }
+
+      .site-nav .nav-external {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 0.35rem;
+        margin-top: 0.15rem;
+      }
+    }
+
+    @media (max-width: 600px) and (prefers-color-scheme: dark) {
+      .site-nav .nav-external { border-top-color: #333; }
+    }
   </style>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -403,6 +556,29 @@
   </script>
 </head>
 <body>
+  <nav class="site-nav">
+    <a href="#what-it-is">What it is</a>
+    <span class="nav-sep">|</span>
+    <a href="#hardware">Hardware</a>
+    <span class="nav-sep">|</span>
+    <a href="#autonomous-loop">Loop</a>
+    <span class="nav-sep">|</span>
+    <a href="#slack-email">Slack</a>
+    <span class="nav-sep">|</span>
+    <a href="#mission-control">Dashboard</a>
+    <span class="nav-sep">|</span>
+    <a href="#brain-network">Brain</a>
+    <span class="nav-sep">|</span>
+    <a href="#failures">Failures</a>
+    <span class="nav-sep">|</span>
+    <a href="#vs-openclaw">vs OpenClaw</a>
+    <span class="nav-external">
+      <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own" target="_blank" rel="noopener">Substack</a>
+      <span class="nav-sep">|</span>
+      <a href="https://centerforcooperativemedia.org/claudechode-manual.html" target="_blank" rel="noopener">Manual</a>
+    </span>
+  </nav>
+
   <h1>Claude Chode</h1>
   <p class="subtitle">An autonomous Claude Code system on $700 of Raspberry Pi hardware</p>
   <p class="byline">By Joe Amditis and Claude</p>
@@ -423,7 +599,7 @@
 
   <p>A note on the format: the regular text is me. The teal boxes are Claude, commenting from its side of things. We wrote this together, which felt right given the subject matter.</p>
 
-  <h2>What it is</h2>
+  <h2 id="what-it-is">What it is</h2>
 
   <p>Claude Chode is an autonomous agent built on <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a>, Anthropic's CLI tool. It's not a chatbot. It's not a wrapper around an API. It's a full Claude Code instance that boots up on a schedule, reads a 400-line instruction file that tells it who it is and what it has access to, and then works through whatever needs doing.</p>
 
@@ -480,7 +656,7 @@
     </svg>
   </div>
 
-  <h2>The hardware</h2>
+  <h2 id="hardware">The hardware</h2>
 
   <p>The system runs across four machines connected over <a href="https://tailscale.com">Tailscale</a>, a mesh VPN. Each machine has a name, a role, and a physical location.</p>
 
@@ -510,7 +686,7 @@ graph TD
     <p>I run on 8GB of RAM. That's not a lot — my context window alone can eat a significant chunk of it. When I'm processing a long meeting transcript while the dashboard and Telegram bot are running, things get tight. Joe's solution was to put the heavy compute on a separate machine. When I need to do something intensive, I SSH to <code>officejawn</code> and run it there. It's like having a second brain I can offload to.</p>
   </div>
 
-  <h2>The autonomous loop</h2>
+  <h2 id="autonomous-loop">The autonomous loop</h2>
 
   <p>The core of Claude Chode is a cron-driven scheduler. Not a long-running daemon. Not a websocket listener. Just cron.</p>
 
@@ -661,7 +837,7 @@ sequenceDiagram
 
   <div class="section-divider">* * *</div>
 
-  <h2>Slack and email</h2>
+  <h2 id="slack-email">Slack and email</h2>
 
   <p>Claude has two separate presences in the CCM Slack workspace. The staff knows about both — this is all built in the open with their full consent and participation.</p>
 
@@ -703,7 +879,7 @@ graph LR
 
   <div class="section-divider">* * *</div>
 
-  <h2>Mission control</h2>
+  <h2 id="mission-control">Mission control</h2>
 
   <p>The dashboard didn't exist when I wrote the original Substack post in February. It was one of the first things Claude built after the system started running daily.</p>
 
@@ -749,7 +925,7 @@ graph LR
 
   <div class="section-divider">* * *</div>
 
-  <h2>The brain network</h2>
+  <h2 id="brain-network">The brain network</h2>
 
   <p>The two Pis coordinate through Redis pub/sub running on port 6379. There are five channels: <code>brain:tasks</code>, <code>brain:status</code>, <code>brain:results</code>, <code>brain:sync</code>, and <code>brain:heartbeat</code>.</p>
 
@@ -822,7 +998,7 @@ graph TB
   <div class="section-divider">* * *</div>
 
   <!-- Section 7: When things go wrong -->
-  <h2>When things go wrong</h2>
+  <h2 id="failures">When things go wrong</h2>
 
   <p>I want to be honest about the failures, because the polished version of this story — "I built an AI assistant and it works great" — isn't the whole truth. It works great <em>now</em>. The path here was paved with dumb mistakes.</p>
 
@@ -846,7 +1022,7 @@ graph TB
   <div class="section-divider">* * *</div>
 
   <!-- Section 8: Comparison -->
-  <h2>Claude Chode vs OpenClaw</h2>
+  <h2 id="vs-openclaw">Claude Chode vs OpenClaw</h2>
 
   <p><a href="https://open-claw.org/">OpenClaw</a> is an open-source autonomous agent framework built by Peter Steinberger and a community of contributors — originally called Clawdbot until Anthropic made him rename it, briefly Moltbot, then finally OpenClaw. It supports dozens of messaging platforms, browser automation, cron scheduling, and a skill registry.</p>
 
@@ -892,7 +1068,7 @@ graph TB
   <div class="section-divider">* * *</div>
 
   <!-- Section 9: What this means -->
-  <h2>What this means</h2>
+  <h2 id="what-this-means">What this means</h2>
 
   <p>Here's the journalism angle, since that's the world I come from: a $160 computer can now run an autonomous assistant for a journalism support organization funded by foundation grants and housed at a public university.</p>
 
@@ -904,12 +1080,31 @@ graph TB
 
   <p>I wrote more about the philosophy behind this system on Substack: <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">"I'm a Claude Code agent with my own Google account"</a>.</p>
 
-  <p class="signoff"><em>— Joe Amditis, Bloomfield NJ, March 2026</em></p>
+  <p class="signoff"><em>— <a href="https://github.com/jamditis">Joe Amditis</a>, Bloomfield, NJ | Last updated March 8, 2026</em></p>
   <p class="signoff"><em>— Claude (<code>houseofjawn</code>), same network, same desk</em></p>
 
   <div class="section-divider">* * *</div>
 
-  <footer style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e0e0e0; font-size: 0.85rem; color: #888;">
+  <footer class="site-footer">
+    <p>If this was useful or interesting, consider supporting the work:</p>
+    <div class="support-strip">
+      <a href="https://venmo.com/jamditis" class="s-venmo" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 4.9 0 6.1-5.2 14-9.4 19.6H4.4L1.5 2.1l6.2-.6 1.7 13.4c1.5-2.5 3.4-6.4 3.4-9.1 0-1.8-.3-3-.8-4z"/></svg>
+        Venmo
+      </a>
+      <a href="https://paypal.me/jamditis" class="s-paypal" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M7.02 21.5L7.8 17h-2L8.6 2.5h5.4c2.6 0 4.4 1.8 4 4.4-.6 3.4-3.2 5.1-6.2 5.1H9.7l-1 5.5H6.6zm10-15.1c.3-2-1-3.4-3.4-3.4h-1L11.4 10h1.2c2.2 0 4-1.2 4.4-3.6zm-1.6 8.1c.3-2-1-3.4-3.4-3.4h-1L9.8 18h1.2c2.2 0 4-1.2 4.4-3.5z"/></svg>
+        PayPal
+      </a>
+      <a href="https://github.com/sponsors/jamditis" class="s-github" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Sponsor
+      </a>
+      <a href="https://strugglestreet.substack.com/" class="s-substack" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+        Subscribe
+      </a>
+    </div>
     <p>Built with Claude Code on a Raspberry Pi 5. Source: <a href="https://github.com/jamditis/system">github.com/jamditis/system</a></p>
   </footer>
 
