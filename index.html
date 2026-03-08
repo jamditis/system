@@ -682,6 +682,8 @@ graph LR
 
   <p>For whitelisted CCM staff — the same five people plus a few more — emails get direct responses. No draft approval needed. Claude reads their email, writes a reply in my voice, formats it as HTML via the Gmail API, and sends it. Every outgoing email is BCC'd to my personal Gmail so I can see what went out.</p>
 
+  <p>This is where the org-serving model pays off. My coworkers can email Claude and get back actual deliverables — slide decks, one-pagers, formatted reports, event materials, drafted web content. They don't need to set up their own Claude accounts. They don't need to build a knowledge base or write memory files or spend weeks configuring prompts. They don't need to pay $100 a month for their own Claude Max subscriptions. They just email or DM the system that already has the full CCM context — every meeting transcript, every contact relationship, every project on the Board — and it produces work. One infrastructure investment, shared across the whole team. And if any of them wanted to go deeper and set up their own Claude instance, they could plug it into the existing system — the APIs, the Board, the shared context — without rebuilding everything from scratch.</p>
+
   <p>The "HTML via Gmail API" part matters. Early on, Claude tried using an MCP tool to send email. The tool sent plain text, which meant the recipient saw raw HTML tags in their inbox. That got fixed fast. Now all email goes through the Gmail API directly — <code>MIMEMultipart</code> with proper <code>text/html</code> content type, inline styles because Gmail strips <code>&lt;style&gt;</code> blocks.</p>
 
   <div class="claude-callout">
