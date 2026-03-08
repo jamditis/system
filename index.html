@@ -18,11 +18,290 @@
   <meta name="twitter:description" content="How a journalist built an autonomous AI assistant on $600 of Raspberry Pi hardware.">
   <meta name="twitter:image" content="https://system.amditis.tech/og-image.png">
   <style>
-    /* Base styles — Task 3 will expand this */
-    body { max-width: 700px; margin: 2rem auto; padding: 0 1rem; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #1a1a1a; }
+    /* === Base layout === */
+    body {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.25rem;
+      font-weight: 800;
+    }
+
+    h2 {
+      margin-top: 2.5rem;
+      font-size: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    h3 {
+      margin-top: 1.5rem;
+    }
+
+    p {
+      margin: 1rem 0;
+    }
+
+    a {
+      color: #0d9488;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 2rem 0;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      margin-top: 0;
+    }
+
+    .byline {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0.5rem 0 1.5rem;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: #f3f4f6;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+
+    blockquote {
+      border-left: 3px solid #0d9488;
+      margin: 1.5rem 0;
+      padding: 0.5rem 1rem;
+      color: #555;
+      font-style: italic;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* === Claude callout box === */
+    .claude-callout {
+      background: #f0fdfa;
+      border-left: 3px solid #0d9488;
+      padding: 1.25rem;
+      border-radius: 6px;
+      margin: 1.5rem 0;
+    }
+
+    .claude-callout .callout-header {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #0d9488;
+      margin-bottom: 0.5rem;
+    }
+
+    .claude-callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* === Comparison table === */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1.5rem 0;
+    }
+
+    .comparison-table th {
+      background: #f3f4f6;
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .comparison-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .comparison-table td:first-child {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* === Screenshot container === */
+    .screenshot {
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .screenshot img {
+      display: block;
+      width: 100%;
+    }
+
+    .screenshot .caption {
+      font-size: 0.85rem;
+      color: #666;
+      padding: 0.75rem;
+      text-align: center;
+      background: #f9fafb;
+    }
+
+    /* === Section visual container === */
+    .section-visual {
+      margin: 2rem auto;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .section-visual svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .section-visual text {
+      fill: #1a1a1a;
+    }
+
+    /* === Mermaid === */
+    .mermaid {
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    /* === Section divider === */
+    .section-divider {
+      text-align: center;
+      margin: 2.5rem 0;
+      color: #ccc;
+      font-size: 1.2rem;
+    }
+
+    /* === SVG animations === */
+    @keyframes pulse-active {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @keyframes pulse-dim {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 0.4; }
+    }
+
+    @keyframes flow-dash {
+      to { stroke-dashoffset: -20; }
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { r: 4; opacity: 1; }
+      50% { r: 6; opacity: 0.7; }
+    }
+
+    /* === Dark mode === */
     @media (prefers-color-scheme: dark) {
-      body { background: #0a0a0a; color: #e0e0e0; }
+      body {
+        background: #0a0a0a;
+        color: #e0e0e0;
+      }
+
       a { color: #5eead4; }
+
+      h2 { border-bottom-color: #333; }
+
+      hr { border-top-color: #333; }
+
+      code, pre { background: #1a1a1a; }
+
+      blockquote {
+        color: #aaa;
+        border-color: #5eead4;
+      }
+
+      .subtitle { color: #999; }
+
+      .byline { color: #999; }
+
+      .claude-callout {
+        background: #0a1f1c;
+        border-left-color: #5eead4;
+      }
+
+      .claude-callout .callout-header {
+        color: #5eead4;
+      }
+
+      .comparison-table th { background: #1a1a1a; }
+
+      .comparison-table td { border-bottom-color: #333; }
+
+      .screenshot {
+        border-color: #333;
+      }
+
+      .screenshot .caption {
+        color: #999;
+        background: #111;
+      }
+
+      .section-visual text {
+        fill: #e0e0e0;
+      }
+
+      .section-divider {
+        color: #444;
+      }
+    }
+
+    /* === Responsive === */
+    @media (max-width: 600px) {
+      body { padding: 0 0.75rem; }
+
+      h1 { font-size: 1.7rem; }
+
+      .comparison-table {
+        font-size: 0.8rem;
+        display: block;
+        overflow-x: auto;
+      }
+
+      .comparison-table td:first-child {
+        white-space: normal;
+      }
+    }
+
+    /* === Print === */
+    @media print {
+      .claude-callout {
+        border: 1px solid #ccc;
+      }
+
+      .section-visual svg {
+        max-height: 300px;
+      }
     }
   </style>
   <script type="module">
@@ -33,6 +312,188 @@
 <body>
   <h1>Claude Chode</h1>
   <p class="subtitle">An autonomous Claude Code system on $600 of Raspberry Pi hardware</p>
-  <!-- Content sections will be added in Tasks 6-8 -->
+  <p class="byline">By Joe Amditis and Claude</p>
+
+  <!-- Section 1: Opening will go here -->
+
+  <div class="section-visual" id="svg-network">
+    <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+      <!-- Connection lines -->
+      <!-- houseofjawn <-> officejawn (solid, labeled Redis) -->
+      <line x1="210" y1="150" x2="390" y2="150" stroke="#999" stroke-width="1.5"/>
+      <text x="300" y="142" text-anchor="middle" font-size="11" fill="#999">Redis</text>
+
+      <!-- houseofjawn -> landofjawn (dashed, labeled SSH) -->
+      <line x1="175" y1="175" x2="275" y2="225" stroke="#999" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="215" y="210" text-anchor="middle" font-size="11" fill="#999">SSH</text>
+
+      <!-- houseofjawn -> legion2025 (dashed, labeled WoL) -->
+      <line x1="175" y1="125" x2="275" y2="75" stroke="#999" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="215" y="90" text-anchor="middle" font-size="11" fill="#999">WoL</text>
+
+      <!-- officejawn -> landofjawn (dashed) -->
+      <line x1="425" y1="175" x2="325" y2="225" stroke="#999" stroke-width="1.5" stroke-dasharray="6 3"/>
+
+      <!-- officejawn -> legion2025 (dashed) -->
+      <line x1="425" y1="125" x2="325" y2="75" stroke="#999" stroke-width="1.5" stroke-dasharray="6 3"/>
+
+      <!-- Node: legion2025 (top-center) -->
+      <g style="animation: pulse-dim 4s infinite;">
+        <rect x="240" y="25" width="120" height="50" rx="8" fill="#7c3aed"/>
+        <text x="300" y="50" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">legion2025</text>
+        <text x="300" y="65" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.8)">GPU worker</text>
+      </g>
+
+      <!-- Node: houseofjawn (center-left) -->
+      <g style="animation: pulse-active 3s infinite;">
+        <rect x="90" y="125" width="120" height="50" rx="8" fill="#0d9488"/>
+        <text x="150" y="150" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">houseofjawn</text>
+        <text x="150" y="165" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.8)">services + bot</text>
+      </g>
+
+      <!-- Node: officejawn (center-right) -->
+      <g style="animation: pulse-active 3s infinite; animation-delay: 0.5s;">
+        <rect x="390" y="125" width="120" height="50" rx="8" fill="#0d9488"/>
+        <text x="450" y="150" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">officejawn</text>
+        <text x="450" y="165" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.8)">compute + browser</text>
+      </g>
+
+      <!-- Node: landofjawn (bottom-center) -->
+      <g style="animation: pulse-dim 4s infinite;">
+        <rect x="240" y="225" width="120" height="50" rx="8" fill="#d97706"/>
+        <text x="300" y="250" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">landofjawn</text>
+        <text x="300" y="265" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.8)">backup</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Section 2: Hardware will go here -->
+  <!-- Section 3: Autonomous loop will go here -->
+
+  <div class="section-visual" id="svg-schedule">
+    <svg viewBox="0 0 600 120" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+      <!-- Hour positions: 12am=50, each hour = (500/24)=20.83px
+           12am=50, 3am=112.5, 6am=175, 7am=195.8, 9am=237.5, 11am=279.2,
+           1pm=320.8, 3pm=362.5, 5pm=404.2, 6pm=425, 9pm=487.5, 12am=550 -->
+
+      <!-- Main timeline -->
+      <line x1="50" y1="60" x2="550" y2="60" stroke="#999" stroke-width="1.5"/>
+
+      <!-- Active hours highlight (7am to 5pm) -->
+      <rect x="195.8" y="45" width="208.4" height="30" rx="4" fill="#0d9488" opacity="0.15"/>
+
+      <!-- Hour ticks -->
+      <line x1="50" y1="55" x2="50" y2="65" stroke="#999" stroke-width="1"/>
+      <text x="50" y="42" text-anchor="middle" font-size="9" fill="#999">12am</text>
+
+      <line x1="112.5" y1="55" x2="112.5" y2="65" stroke="#999" stroke-width="1"/>
+      <text x="112.5" y="42" text-anchor="middle" font-size="9" fill="#999">3am</text>
+
+      <line x1="175" y1="55" x2="175" y2="65" stroke="#999" stroke-width="1"/>
+      <text x="175" y="42" text-anchor="middle" font-size="9" fill="#999">6am</text>
+
+      <line x1="425" y1="55" x2="425" y2="65" stroke="#999" stroke-width="1"/>
+      <text x="425" y="42" text-anchor="middle" font-size="9" fill="#999">6pm</text>
+
+      <line x1="487.5" y1="55" x2="487.5" y2="65" stroke="#999" stroke-width="1"/>
+      <text x="487.5" y="42" text-anchor="middle" font-size="9" fill="#999">9pm</text>
+
+      <line x1="550" y1="55" x2="550" y2="65" stroke="#999" stroke-width="1"/>
+      <text x="550" y="42" text-anchor="middle" font-size="9" fill="#999">12am</text>
+
+      <!-- 15-min notification check dots (7am-5pm, every 15 min = ~5.2px spacing) -->
+      <!-- Using small dots at regular intervals within the active window -->
+      <g fill="#999" opacity="0.4">
+        <circle cx="201" cy="60" r="1.5"/>
+        <circle cx="206.2" cy="60" r="1.5"/>
+        <circle cx="211.4" cy="60" r="1.5"/>
+        <circle cx="216.6" cy="60" r="1.5"/>
+        <circle cx="221.9" cy="60" r="1.5"/>
+        <circle cx="227.1" cy="60" r="1.5"/>
+        <circle cx="232.3" cy="60" r="1.5"/>
+        <circle cx="243" cy="60" r="1.5"/>
+        <circle cx="248.2" cy="60" r="1.5"/>
+        <circle cx="253.4" cy="60" r="1.5"/>
+        <circle cx="258.6" cy="60" r="1.5"/>
+        <circle cx="263.9" cy="60" r="1.5"/>
+        <circle cx="269.1" cy="60" r="1.5"/>
+        <circle cx="274.3" cy="60" r="1.5"/>
+        <circle cx="284.7" cy="60" r="1.5"/>
+        <circle cx="289.9" cy="60" r="1.5"/>
+        <circle cx="295.1" cy="60" r="1.5"/>
+        <circle cx="300.3" cy="60" r="1.5"/>
+        <circle cx="305.6" cy="60" r="1.5"/>
+        <circle cx="310.8" cy="60" r="1.5"/>
+        <circle cx="316" cy="60" r="1.5"/>
+        <circle cx="326.4" cy="60" r="1.5"/>
+        <circle cx="331.6" cy="60" r="1.5"/>
+        <circle cx="336.8" cy="60" r="1.5"/>
+        <circle cx="342" cy="60" r="1.5"/>
+        <circle cx="347.3" cy="60" r="1.5"/>
+        <circle cx="352.5" cy="60" r="1.5"/>
+        <circle cx="357.7" cy="60" r="1.5"/>
+        <circle cx="368.1" cy="60" r="1.5"/>
+        <circle cx="373.3" cy="60" r="1.5"/>
+        <circle cx="378.5" cy="60" r="1.5"/>
+        <circle cx="383.7" cy="60" r="1.5"/>
+        <circle cx="389" cy="60" r="1.5"/>
+        <circle cx="394.2" cy="60" r="1.5"/>
+        <circle cx="399.4" cy="60" r="1.5"/>
+      </g>
+
+      <!-- 2-hour check-in dots with pulse animation -->
+      <!-- 7am=195.8, 9am=237.5, 11am=279.2, 1pm=320.8, 3pm=362.5, 5pm=404.2 -->
+      <circle cx="195.8" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0s;"/>
+      <circle cx="237.5" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0.3s;"/>
+      <circle cx="279.2" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0.6s;"/>
+      <circle cx="320.8" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 0.9s;"/>
+      <circle cx="362.5" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 1.2s;"/>
+      <circle cx="404.2" cy="60" r="5" fill="#0d9488" style="animation: pulse-dot 2s infinite; animation-delay: 1.5s;"/>
+
+      <!-- Check-in labels -->
+      <text x="195.8" y="82" text-anchor="middle" font-size="10" font-weight="600" fill="#0d9488">7am</text>
+      <text x="237.5" y="82" text-anchor="middle" font-size="10" font-weight="600" fill="#0d9488">9am</text>
+      <text x="279.2" y="82" text-anchor="middle" font-size="10" font-weight="600" fill="#0d9488">11am</text>
+      <text x="320.8" y="82" text-anchor="middle" font-size="10" font-weight="600" fill="#0d9488">1pm</text>
+      <text x="362.5" y="82" text-anchor="middle" font-size="10" font-weight="600" fill="#0d9488">3pm</text>
+      <text x="404.2" y="82" text-anchor="middle" font-size="10" font-weight="600" fill="#0d9488">5pm</text>
+
+      <!-- Weekdays only note -->
+      <text x="300" y="108" text-anchor="middle" font-size="11" font-style="italic" fill="#999">weekdays only</text>
+    </svg>
+  </div>
+
+  <!-- Section 4: Slack and email will go here -->
+  <!-- Section 5: Mission control will go here -->
+  <!-- Section 6: Brain network will go here -->
+
+  <div class="section-visual" id="svg-dataflow">
+    <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+      <!-- Left box: houseofjawn -->
+      <rect x="50" y="50" width="180" height="80" rx="8" fill="none" stroke="#0d9488" stroke-width="2"/>
+      <text x="140" y="85" text-anchor="middle" font-size="13" font-weight="600">houseofjawn</text>
+      <text x="140" y="103" text-anchor="middle" font-size="10" fill="#999">services + scheduler</text>
+
+      <!-- Right box: officejawn -->
+      <rect x="370" y="50" width="180" height="80" rx="8" fill="none" stroke="#0d9488" stroke-width="2"/>
+      <text x="460" y="85" text-anchor="middle" font-size="13" font-weight="600">officejawn</text>
+      <text x="460" y="103" text-anchor="middle" font-size="10" fill="#999">compute + browser</text>
+
+      <!-- Top path (left to right): tasks and status -->
+      <path d="M 230 72 C 280 52, 320 52, 370 72" fill="none" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="8 4" style="animation: flow-dash 1.5s linear infinite;"/>
+      <text x="300" y="52" text-anchor="middle" font-size="10" fill="#999">brain:tasks, brain:status</text>
+
+      <!-- Bottom path (right to left): results and sync -->
+      <path d="M 370 108 C 320 128, 280 128, 230 108" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="8 4" style="animation: flow-dash 1.5s linear infinite reverse;"/>
+      <text x="300" y="148" text-anchor="middle" font-size="10" fill="#999">brain:results, brain:sync</text>
+
+      <!-- Center label -->
+      <text x="300" y="97" text-anchor="middle" font-size="12" font-weight="700" fill="#0d9488">Redis pub/sub</text>
+    </svg>
+  </div>
+
+  <!-- Section 7: Failures will go here -->
+  <!-- Section 8: Comparison will go here -->
+  <!-- Section 9: Closing will go here -->
 </body>
 </html>
