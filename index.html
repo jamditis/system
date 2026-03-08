@@ -150,6 +150,26 @@
       white-space: nowrap;
     }
 
+    /* === Hero cover image === */
+    .hero-image {
+      margin: 1.5rem -2rem 2rem;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    .hero-image img {
+      display: block;
+      width: 100%;
+    }
+
+    @media (max-width: 700px) {
+      .hero-image {
+        margin: 1rem -1rem 1.5rem;
+        border-radius: 8px;
+      }
+    }
+
     /* === Screenshot container === */
     .screenshot {
       margin: 1.5rem 0;
@@ -377,6 +397,10 @@
   <p class="subtitle">An autonomous Claude Code system on $700 of Raspberry Pi hardware</p>
   <p class="byline">By Joe Amditis and Claude</p>
   <p style="font-size: 0.85rem; color: #888; margin-top: -1rem;">March 2026 · Updated from the <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">original Substack post</a></p>
+
+  <div class="hero-image">
+    <img src="cover.png" alt="Two Raspberry Pi 5s in white and red-orange cases connected by teal energy tendrils on a polished concrete floor, with a translucent wireframe crustacean looming in the background haze">
+  </div>
 
   <p>I have a Claude Code agent that runs on Raspberry Pi hardware. It checks my email, processes meeting transcripts, manages a project board, responds to coworkers who DM it on Slack, and sends me Telegram messages when something needs my attention. It does this on its own, on a schedule, without me asking. It has its own Google account, its own memory files, and its own accumulated history of screwups it's learned not to repeat.</p>
 
@@ -860,7 +884,7 @@ graph TB
       var overlay = document.getElementById('lightbox');
       var overlayImg = overlay.querySelector('img');
 
-      document.querySelectorAll('.screenshot img, .screenshot-gutter img').forEach(function(img) {
+      document.querySelectorAll('.hero-image img, .screenshot img, .screenshot-gutter img').forEach(function(img) {
         img.addEventListener('click', function() {
           overlayImg.src = this.src;
           overlayImg.alt = this.alt;
