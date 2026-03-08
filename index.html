@@ -830,7 +830,9 @@ graph TB
   <!-- Section 8: Comparison -->
   <h2>Claude Chode vs OpenClaw</h2>
 
-  <p><a href="https://open-claw.org/">OpenClaw</a> is an open-source autonomous agent framework built by Peter Steinberger and a community of contributors. It supports dozens of messaging platforms, browser automation, cron scheduling, and a skill registry. Brandon Wang <a href="https://brandon.wang/2026/clawdbot">wrote about his particular setup</a> — OpenClaw on a Mac Mini, interacting through a private Slack workspace with separate channels for different tasks. His system manages his calendar, Notion, grocery lists, and Apple Reminders. Here's how his setup compares to ours:</p>
+  <p><a href="https://open-claw.org/">OpenClaw</a> is an open-source autonomous agent framework built by Peter Steinberger and a community of contributors — originally called Clawdbot until Anthropic made him rename it, briefly Moltbot, then finally OpenClaw. It supports dozens of messaging platforms, browser automation, cron scheduling, and a skill registry.</p>
+
+  <p>Brandon Wang <a href="https://brandon.wang/2026/clawdbot">wrote about his particular setup</a> in February 2026. He runs OpenClaw on a Mac Mini at home, communicating through a private Slack workspace with separate channels for different tasks. The core of his system is iMessage integration — OpenClaw monitors his texts, detects when he makes promises ("let me review this tomorrow"), creates calendar holds when plans are forming, and drafts invites when a time, place, and confirmation all exist. He runs 30+ price alerts with complex reasoning criteria (like checking Airbnb listing photos to verify a pullout bed isn't in the same room as another bed), books restaurants through Resy and OpenTable, tracks packages, manages grocery lists through Apple Reminders, and even handles dentist appointments. He runs Opus 4.5 and explicitly chose not to optimize for cheaper models. Here's how his setup compares to ours:</p>
 
   <table class="comparison-table">
     <thead>
@@ -838,18 +840,36 @@ graph TB
     </thead>
     <tbody>
       <tr><td>Framework</td><td>Custom (Claude Code + scripts)</td><td>OpenClaw (open-source)</td></tr>
+      <tr><td>Model</td><td>Claude Sonnet 4.5 (via CLI)</td><td>Claude Opus 4.5</td></tr>
       <tr><td>Hardware</td><td>2x Pi 5 + Intel backup + GPU workstation</td><td>Mac Mini</td></tr>
       <tr><td>Cost</td><td>~$688 (dedicated nodes)</td><td>Mac Mini (~$600)</td></tr>
       <tr><td>Interface</td><td>Telegram + web dashboard</td><td>Private Slack workspace</td></tr>
+      <tr><td>Messaging</td><td>Slack DMs (whitelisted staff)</td><td>iMessage (texts, 2FA codes)</td></tr>
       <tr><td>Nodes</td><td>4 (distributed mesh)</td><td>1 (single machine)</td></tr>
-      <tr><td>Calendar</td><td>Google Calendar (4 calendars)</td><td>Apple Calendar</td></tr>
+      <tr><td>Calendar</td><td>Google Calendar (4 calendars)</td><td>Apple Calendar (shared with partner)</td></tr>
       <tr><td>Task tracking</td><td>Custom Board (SQLite, 323+ items)</td><td>Notion + Apple Reminders</td></tr>
       <tr><td>Email</td><td>Gmail API (own Google account)</td><td>Excluded by choice</td></tr>
-      <tr><td>Identity</td><td>Own Google account + Slack presence</td><td>Slack channels</td></tr>
+      <tr><td>Browser</td><td>Headless Chromium (ARM64)</td><td>Real Chrome window (avoids CAPTCHAs)</td></tr>
     </tbody>
   </table>
 
-  <p>The real difference isn't technical — it's about who the system serves. Wang optimized for a single person's productivity. One user, one machine, tight feedback loops. He intentionally excludes email and social media — boundaries that make sense for personal use. Our system was built for an organization: the Center for Cooperative Media, a team of about 10 people running programs, events, and a news service. Claude responds to flagged Slack messages from staff, processes meeting transcripts from multiple people, tracks contacts and interactions across the whole team. Different goals, different architectures. Both cost about the same as a decent office chair.</p>
+  <p>Wang frames the value of an AI assistant in three phases: gathering information, improving it, and actioning on it. Most AI use today focuses on the middle — you gather data yourself, hand it to the model, then act on the output yourself. His argument is that the real lift comes from gathering and actioning. OpenClaw monitors his texts and figures out when a calendar event needs to exist. It checks Resy availability against two people's calendars. The value comes from connecting systems that don't talk to each other.</p>
+
+  <p>Our system does the same thing for an organization instead of a person. The Center for Cooperative Media is a team of about 10 people running programs, events, and a news service. Claude responds to flagged Slack messages from staff, processes meeting transcripts from multiple people, tracks contacts and interactions across the whole team. Wang intentionally excludes email and social media — boundaries that make sense for personal use. We went the other direction: Claude has its own Google account, sends emails on my behalf, and manages relationships across the whole org. Different scope, same underlying insight. Both cost about the same as a decent office chair.</p>
+
+  <h3>Why I didn't use OpenClaw</h3>
+
+  <p>I get asked this a lot. OpenClaw is a good project and Wang's post is worth reading if you're thinking about any of this. But I built my own system for reasons that go beyond preference.</p>
+
+  <p>First: OpenClaw wants a Mac. The iMessage integration — which is a core selling point — only works on macOS because Apple locks down the Messages database to its own hardware. So people are buying $600 Mac Minis to sit in a closet and run a chatbot. That's a computer whose entire purpose is to let Claude send blue bubbles. I already had two Raspberry Pis. They cost $160 and $300, they draw 5 watts each, and they run Linux. I didn't need iMessage. I needed email, Slack, and a project board.</p>
+
+  <p>Second: the security model makes me uncomfortable. Wang is honest about this in his post — he gives OpenClaw access to his text messages, his 2FA codes, his bank login, his contacts. He compares the risk to trusting a human personal assistant with your credit card. I think that's the wrong analogy. A human assistant has legal liability, a reputation, and a survival instinct. An LLM has none of those things. It can be prompt-injected by a webpage it visits. It can hallucinate an action and execute it before you notice. The risk profile is different in kind, not just degree.</p>
+
+  <p>The online discourse around OpenClaw has been wild. People connecting their OpenClaws together on a social network. People running it with unlimited permissions on their primary machines. People blowing through API tokens with no budget limits. Wang himself thinks most of this is ridiculous — his post is explicitly framed as "a sane case" in contrast to the extremes. But the framework encourages maximum access by design. Every new permission unlocks something useful, and the ratchet only goes one direction.</p>
+
+  <p>My system takes the opposite approach. Claude has its own Google account — not mine. It sends email as itself, not as me. Every outgoing email gets BCC'd to my personal inbox. Slack responses go through a user account that staff know is a bot. The dashboard logs every action. I can see exactly what Claude did, when, and why. If something goes wrong, the blast radius is contained. Claude can't drain my bank account because it doesn't have my bank login. It can't impersonate me in texts because it doesn't have my phone.</p>
+
+  <p>OpenClaw is built around the idea that more access equals more value, and Wang's experience bears that out for personal use. My system is built around the idea that an agent serving an organization needs constraints that are structural, not just behavioral. Both approaches work. I sleep better with mine.</p>
 
   <div class="section-divider">* * *</div>
 
