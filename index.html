@@ -171,6 +171,41 @@
       background: #f9fafb;
     }
 
+    /* === Gutter screenshots (phone-sized, float into sidebar) === */
+    .screenshot-gutter {
+      position: relative;
+      float: right;
+      width: 240px;
+      margin: 0 -280px 1.5rem 1.5rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+      clear: right;
+    }
+
+    .screenshot-gutter img {
+      display: block;
+      width: 100%;
+    }
+
+    .screenshot-gutter .caption {
+      font-size: 0.8rem;
+      color: #666;
+      padding: 0.5rem;
+      text-align: center;
+      background: #f9fafb;
+    }
+
+    /* On screens too narrow for gutter, fall back to inline centered */
+    @media (max-width: 1100px) {
+      .screenshot-gutter {
+        float: none;
+        width: 100%;
+        max-width: 320px;
+        margin: 1.5rem auto;
+      }
+    }
+
     /* === Section visual container === */
     .section-visual {
       margin: 2rem auto;
@@ -258,11 +293,13 @@
 
       .comparison-table td { border-bottom-color: #333; }
 
-      .screenshot {
+      .screenshot,
+      .screenshot-gutter {
         border-color: #333;
       }
 
-      .screenshot .caption {
+      .screenshot .caption,
+      .screenshot-gutter .caption {
         color: #999;
         background: #111;
       }
@@ -547,9 +584,9 @@ sequenceDiagram
     Claude->>Services: log to Board + CRM
   </div>
 
-  <div class="screenshot">
+  <div class="screenshot-gutter">
     <img src="screenshots/telegram-checkin-1.jpeg" alt="Telegram notification showing a Claude check-in summary" loading="lazy">
-    <div class="caption">A typical morning check-in delivered via Telegram. Claude summarizes what it found and what it did.</div>
+    <div class="caption">A morning check-in via Telegram.</div>
   </div>
 
   <p>The CLAUDE.md is the single most important file in the system. Every rule in that file exists because something went wrong without it. "Always use <code>timeout --foreground</code> with Claude Code" — that's there because plain <code>timeout</code> kills the Node.js process tree before it can produce output, and I spent an afternoon debugging blank output files. "Never use real email addresses in tests" — that's there because a test accidentally emailed a real person. The file is a changelog of failures, encoded as rules.</p>
@@ -563,22 +600,25 @@ sequenceDiagram
 
   <h2>Slack and email</h2>
 
-  <p>Here's the weird part about Claude's Slack setup: there are two separate presences, and they work together in a way that's designed to be invisible.</p>
+  <p>Claude has two separate presences in the CCM Slack workspace. The staff knows about both — this is all built in the open with their full consent and participation.</p>
 
   <p>The first is an app called @Auditor. It's a bot that connects to Slack via Socket Mode — meaning it receives events in real time without polling. It watches for DMs, @mentions, and flagged messages. But @Auditor never responds to anyone. It's a listener.</p>
 
-  <p>The second presence is a regular Slack user account. The email is <code>amditisjunk@gmail.com</code>. The display name is "Joe." When Claude generates a response to a staff member's DM, it posts that response using this user account's token. From the staff member's perspective, they sent a message to Joe and Joe replied.</p>
+  <p>The second presence is a separate user account called "Joe (via Claude)." Five whitelisted staff members DM this account when they need something. They know they're talking to a Claude bot that I manage. The @Auditor bot receives these DM events via Socket Mode and routes them to Claude for processing. Responses get posted back through the user account's token so the conversation stays in one thread.</p>
 
   <div class="mermaid">
 graph LR
-    Staff["CCM staff DMs 'Joe'"] -->|Socket Mode| Bot["@Auditor bot<br/><small>receives event</small>"]
+    Staff["CCM staff DMs<br/>'Joe (via Claude)'"] -->|Socket Mode| Bot["@Auditor bot<br/><small>receives event</small>"]
     Bot --> Claude["Claude processes<br/><small>+ generates response</small>"]
-    Claude -->|user token| Slack["Posted as Joe<br/><small>in Slack</small>"]
+    Claude -->|user token| Slack["Posted as<br/><small>Joe (via Claude)</small>"]
   </div>
 
-  <p>Five CCM staff members are whitelisted to DM what they think is me. It's Claude on the other end, responding in my voice.</p>
+  <p>Even though the staff knows it's a bot, I still wanted the responses to sound like me rather than like a corporate help desk. So I exported 47 of my real Slack messages and ran the numbers. 79% start lowercase. I use exclamation points for warmth — "Thanks!" and "Got it!" but never "Please be advised." I type "lol" and "lmk" on Slack. Claude learned these patterns and follows them.</p>
 
-  <p>To pull that off, Claude needed a style guide. I exported 47 of my real Slack messages and ran the numbers. 79% start lowercase. I use exclamation points for warmth — "Thanks!" and "Got it!" but never "Please be advised." I type "lol" and "lmk" on Slack. I don't use corporate language. Claude learned these patterns and follows them. The result is close enough that nobody has noticed.</p>
+  <div class="screenshot-gutter">
+    <img src="screenshots/telegram-checkin-2.jpeg" alt="Telegram showing email approval buttons" loading="lazy">
+    <div class="caption">Email approval buttons in Telegram.</div>
+  </div>
 
   <p>Email works differently. For most recipients, Claude drafts the email and sends me a Telegram message with three buttons: Approve, Edit, Cancel. One tap on my phone and the email goes out. The entire email workflow fits in the time it takes to unlock my phone.</p>
 
