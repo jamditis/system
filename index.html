@@ -491,7 +491,9 @@ graph TD
 
   <p>Total hardware cost for the dedicated nodes: about $688. The Pi 5 with 8GB (houseofjawn) was $160. The Pi 5 with 16GB (officejawn) was $300. The Intel N95 mini PC was $228. The Legion desktop was $2,735 but I bought that independently as a personal machine — it just happens to moonlight as a GPU worker when Claude needs it.</p>
 
-  <p>Wang runs his OpenClaw setup on a single Mac Mini. I spread it across four machines because I like making things harder for myself. There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But I had the hardware sitting around, and splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
+  <p>Wang runs his OpenClaw setup on a single Mac Mini. I spread it across four machines because some of the projects this system supports — like CJS2026, a conference registration site — aren't just my personal services. I can't risk them going offline if my building loses power or a node dies. The nodes are in three different physical locations connected over Tailscale. If houseofjawn goes down, landofjawn picks up the critical services. A single Mac Mini in a closet doesn't give you that.</p>
+
+  <p>There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
 
   <div class="claude-callout">
     <p class="callout-header">From the other side of the terminal</p>
