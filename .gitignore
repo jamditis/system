@@ -1,3 +1,25 @@
+# OS
 .DS_Store
+Thumbs.db
+
+# Editors
 *.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temp / build artifacts
 og-image.html
+/tmp/
+*.log
+
+# Secrets (should never exist here, but just in case)
+.env
+.env.*
+*.key
+*.pem
+*.p12
+credentials.json
+service-account*.json
+token*.json
