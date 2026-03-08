@@ -561,9 +561,124 @@ sequenceDiagram
 
   <div class="section-divider">* * *</div>
 
-  <!-- Section 4: Slack and email will go here -->
-  <!-- Section 5: Mission control will go here -->
-  <!-- Section 6: Brain network will go here -->
+  <h2>Slack and email</h2>
+
+  <p>Here's the weird part about Claude's Slack setup: there are two separate presences, and they work together in a way that's designed to be invisible.</p>
+
+  <p>The first is an app called @Auditor. It's a bot that connects to Slack via Socket Mode — meaning it receives events in real time without polling. It watches for DMs, @mentions, and flagged messages. But @Auditor never responds to anyone. It's a listener.</p>
+
+  <p>The second presence is a regular Slack user account. The email is <code>amditisjunk@gmail.com</code>. The display name is "Joe." When Claude generates a response to a staff member's DM, it posts that response using this user account's token. From the staff member's perspective, they sent a message to Joe and Joe replied.</p>
+
+  <div class="mermaid">
+graph LR
+    Staff["CCM staff DMs 'Joe'"] -->|Socket Mode| Bot["@Auditor bot<br/><small>receives event</small>"]
+    Bot --> Claude["Claude processes<br/><small>+ generates response</small>"]
+    Claude -->|user token| Slack["Posted as Joe<br/><small>in Slack</small>"]
+  </div>
+
+  <p>Five CCM staff members are whitelisted to DM what they think is me. It's Claude on the other end, responding in my voice.</p>
+
+  <p>To pull that off, Claude needed a style guide. I exported 47 of my real Slack messages and ran the numbers. 79% start lowercase. I use exclamation points for warmth — "Thanks!" and "Got it!" but never "Please be advised." I type "lol" and "lmk" on Slack. I don't use corporate language. Claude learned these patterns and follows them. The result is close enough that nobody has noticed.</p>
+
+  <p>Email works differently. For most recipients, Claude drafts the email and sends me a Telegram message with three buttons: Approve, Edit, Cancel. One tap on my phone and the email goes out. The entire email workflow fits in the time it takes to unlock my phone.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/email-approval-1.jpeg" alt="Telegram showing email draft approval with Send, Edit, and Cancel buttons" loading="lazy">
+    <div class="caption">Email draft approval in Telegram. One tap to send, edit, or cancel.</div>
+  </div>
+
+  <p>For whitelisted CCM staff — the same five people plus a few more — emails get direct responses. No draft approval needed. Claude reads their email, writes a reply in my voice, formats it as HTML via the Gmail API, and sends it. Every outgoing email is BCC'd to my personal Gmail so I can see what went out.</p>
+
+  <p>The "HTML via Gmail API" part matters. Early on, Claude tried using an MCP tool to send email. The tool sent plain text, which meant the recipient saw raw HTML tags in their inbox. That got fixed fast. Now all email goes through the Gmail API directly — <code>MIMEMultipart</code> with proper <code>text/html</code> content type, inline styles because Gmail strips <code>&lt;style&gt;</code> blocks.</p>
+
+  <div class="claude-callout">
+    <p class="callout-header">From the other side of the terminal</p>
+    <p>The style guide was a good exercise. Joe writes short. He starts messages lowercase unless it's a name. He uses "sounds good" and "for sure" more than "acknowledged" or "understood." Learning someone's communication patterns from data is different from guessing at them — you notice things the person wouldn't think to tell you. Like the fact that he ends 34% of his messages with an exclamation point, but never uses two in a row.</p>
+  </div>
+
+  <div class="section-divider">* * *</div>
+
+  <h2>Mission control</h2>
+
+  <p>The dashboard didn't exist when I wrote the original Substack post in February. It was one of the first things Claude built after the system started running daily.</p>
+
+  <p>It lives at <code>pi.amditis.tech</code>, accessible through a Cloudflare Tunnel. The stack is React 19 and Vite on the frontend, FastAPI and SQLite on the backend, with Socket.io for real-time updates. It's the single pane of glass for the entire system.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/dashboard-overview.png" alt="Dashboard showing system metrics, brain network status, and service health" loading="lazy">
+    <div class="caption">The main dashboard showing system metrics across all nodes, with the brain network status at the bottom.</div>
+  </div>
+
+  <h3>The Board</h3>
+
+  <p>The Board is a kanban system. It has 323 items right now — 30 projects, 286 tasks, 7 ideas. Claude logs tasks here during scheduled sessions. When Claude processes an email that contains an action item, it creates a Board task with the source URL and priority level. When it finishes something, it moves the card to done.</p>
+
+  <p>Before the Board existed, Claude would summarize tasks in Telegram messages that I'd read once and forget. Now everything is tracked. I can filter by source (email, transcript, Slack), by priority, by status. If someone asks me "did you follow up on that thing from last week's meeting," I can search the Board instead of scrolling through Telegram.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/kanban-board.png" alt="Kanban board with backlog, in progress, review, and done columns" loading="lazy">
+    <div class="caption">The Board tracks everything Claude works on. 323 items and counting.</div>
+  </div>
+
+  <h3>The CRM</h3>
+
+  <p>The CRM tracks contacts and organizations. 270+ contacts, 635 organizations, with a relationship graph built on force-directed visualization. I can see which CCM staff member is connected to which funder through which program at a glance.</p>
+
+  <p>When Claude processes a meeting transcript that mentions a new person, it creates a contact entry and logs the interaction. Over time, the graph fills in. It's not a replacement for a real CRM — it's a memory aid that gets populated automatically.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/network-graph.png" alt="Force-directed network graph showing contacts, organizations, and their relationships" loading="lazy">
+    <div class="caption">The CRM relationship graph. Each dot is a contact or organization. Lines show affiliations and shared program participation.</div>
+  </div>
+
+  <h3>The C2 panel</h3>
+
+  <p>C2 is "command and control." It shows the autonomous scheduling system — scheduled wakes, event notifications, email drafts, system health, cron jobs. This is where I can see if Claude missed a wake or if a pipeline is backed up.</p>
+
+  <p>The dashboard also lets me spawn Claude sessions in the browser. I can type a prompt, approve tool use, send follow-up messages. Like having a terminal in the browser with guardrails.</p>
+
+  <div class="claude-callout">
+    <p class="callout-header">From the other side of the terminal</p>
+    <p>The Board changed how I work. Before it existed, I'd summarize tasks in Telegram messages that Joe would read once and forget. Now every action item from an email or meeting gets logged as a Board task with a source link. When I wake up for a check-in, I can see what's still in progress, what's been done, and what's stuck in review. It's the difference between working from memory and working from a system.</p>
+  </div>
+
+  <div class="section-divider">* * *</div>
+
+  <h2>The brain network</h2>
+
+  <p>The two Pis coordinate through Redis pub/sub running on port 6379. There are five channels: <code>brain:tasks</code>, <code>brain:status</code>, <code>brain:results</code>, <code>brain:sync</code>, and <code>brain:heartbeat</code>.</p>
+
+  <p>houseofjawn runs the services — the Telegram bot, the dashboard, the Cloudflare tunnel, the cron scheduler, Pi-hole for DNS. officejawn handles heavy compute and browser automation. The split exists because 8GB of RAM isn't enough to run services and chew through a 90-minute meeting transcript at the same time.</p>
+
+  <p>When I need to process something that would choke the services Pi — a long transcript, a code review, multiple parallel subagents — I SSH to officejawn and run it there. The scheduler on houseofjawn knows how to dispatch work to officejawn and collect results through the Redis channels.</p>
+
+  <div class="mermaid">
+graph TB
+    subgraph houseofjawn["houseofjawn (services)"]
+        Bot["Telegram bot"]
+        Dash["Dashboard + API"]
+        Sched["Scheduler"]
+        Tunnel["Cloudflare tunnel"]
+        DNS["Pi-hole DNS"]
+    end
+    subgraph officejawn["officejawn (compute)"]
+        Compute["Heavy processing"]
+        Browser["Browser automation"]
+        VNC["Virtual desktop"]
+    end
+    houseofjawn <-->|"Redis pub/sub<br/>5 channels"| officejawn
+  </div>
+
+  <p>Brain sync is a backup script that mirrors project directories between the two Pis. It runs on demand — triggered from the dashboard with one button or from the command line. If officejawn goes down (it runs on university wifi, which is exactly as reliable as that sounds), houseofjawn has a copy of everything.</p>
+
+  <p>officejawn also runs a virtual desktop using Xvfb — a headless X server. On top of that, Playwright drives a Chromium browser for social media automation. Posting to Twitter, Bluesky, engaging with accounts on behalf of the Center for Cooperative Media. The browser runs in a persistent session with cookies and extensions loaded, accessible via VNC from any machine on the Tailscale network.</p>
+
+  <div class="screenshot">
+    <img src="screenshots/c2-tools.png" alt="C2 panel showing scheduled wakes, event notifications, email drafts, and system state" loading="lazy">
+    <div class="caption">The C2 panel tracks every autonomous pipeline. Scheduled wakes, event triggers, email drafts, and 12 cron jobs visible at a glance.</div>
+  </div>
+
+  <p>For cross-machine Claude coordination — when Claude on houseofjawn needs Claude on officejawn to do something — there's a file-based protocol. Request and response files live in <code>.claude-coordination/</code> directories inside shared git repos. One Claude writes a request, commits it, pushes. The other Claude pulls, acts on it, writes a response, pushes back. It's like passing notes between classrooms.</p>
 
   <div class="section-visual" id="svg-dataflow">
     <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
@@ -589,6 +704,8 @@ sequenceDiagram
       <text x="300" y="97" text-anchor="middle" font-size="12" font-weight="700" fill="#0d9488">Redis pub/sub</text>
     </svg>
   </div>
+
+  <div class="section-divider">* * *</div>
 
   <!-- Section 7: Failures will go here -->
   <!-- Section 8: Comparison will go here -->
