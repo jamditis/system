@@ -406,7 +406,8 @@
 
   <p>I named it Claude Chode because naming things is my worst skill and I thought it was funny at 2am. It stuck.</p>
 
-  <p>When I saw Brandon Wang's <a href="https://www.brandonwang.dev/blog/how-i-built-openclaw-my-autonomous-ai-agent">post about his OpenClaw setup</a>, I recognized the same disease. He runs Claude on a Mac Mini via Slack. I run it on a pair of $80 single-board computers connected over a mesh VPN. Different symptoms, same underlying condition: the compulsion to give an AI agent a persistent home and let it run.</p>
+  <p>When I saw Brandon Wang's <a href="https://brandon.wang/2026/clawdbot">post about his OpenClaw setup</a>, I recognized a kindred spirit. <a href="https://open-claw.org/">OpenClaw</a> is Peter Steinberger's open-source autonomous agent framework — originally called Clawdbot until Anthropic made him rename it, briefly Moltbot, then finally OpenClaw. Wang runs it on a Mac Mini via Slack. I run Claude Code directly on a pair of $80 single-board computers connected over a mesh VPN. Same impulse: give an AI agent a permanent home on real hardware and let it run.</p></invoke>
+
 
   <p>I wrote about this system <a href="https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own">on Substack</a> back in February, told from Claude's perspective. That post was the introduction. This one is the technical walkthrough — what the system looks like now after a month of daily use, with all the scars visible.</p>
 
@@ -490,7 +491,7 @@ graph TD
 
   <p>Total hardware cost for the dedicated nodes: about $688. The Pi 5 with 8GB (houseofjawn) was $160. The Pi 5 with 16GB (officejawn) was $300. The Intel N95 mini PC was $228. The Legion desktop was $2,735 but I bought that independently as a personal machine — it just happens to moonlight as a GPU worker when Claude needs it.</p>
 
-  <p>Wang runs everything on a single Mac Mini. I spread it across four machines because I like making things harder for myself. There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But I had the hardware sitting around, and splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
+  <p>Wang runs his OpenClaw setup on a single Mac Mini. I spread it across four machines because I like making things harder for myself. There's a real argument for the single-machine approach — less network latency, no SSH coordination, simpler debugging. But I had the hardware sitting around, and splitting roles means each machine can be optimized for its job. The services Pi stays cool and responsive. The compute Pi can peg its CPU without affecting the bot's response time.</p>
 
   <div class="claude-callout">
     <p class="callout-header">From the other side of the terminal</p>
@@ -829,27 +830,26 @@ graph TB
   <!-- Section 8: Comparison -->
   <h2>Claude Chode vs OpenClaw</h2>
 
-  <p>A few weeks after I started writing about this system, Brandon Wang published a post about <a href="https://blog.brandonwang.ca/posts/openclaw/">OpenClaw</a> — his own autonomous Claude setup built on a single Mac Mini M4, roughly the same price point as ours (~$700). His system is optimized for personal productivity: managing his calendar, triaging email, handling tasks through a Slack workspace. It's a clean, focused build. Here's how the two compare:</p>
+  <p><a href="https://open-claw.org/">OpenClaw</a> is an open-source autonomous agent framework built by Peter Steinberger and a community of contributors. It supports dozens of messaging platforms, browser automation, cron scheduling, and a skill registry. Brandon Wang <a href="https://brandon.wang/2026/clawdbot">wrote about his particular setup</a> — OpenClaw on a Mac Mini, interacting through a private Slack workspace with separate channels for different tasks. His system manages his calendar, Notion, grocery lists, and Apple Reminders. Here's how his setup compares to ours:</p>
 
   <table class="comparison-table">
     <thead>
-      <tr><th></th><th>Claude Chode</th><th>OpenClaw</th></tr>
+      <tr><th></th><th>Claude Chode</th><th>Wang's OpenClaw</th></tr>
     </thead>
     <tbody>
-      <tr><td>Hardware</td><td>2x Pi 5 + Intel backup + GPU workstation</td><td>Mac Mini M4</td></tr>
-      <tr><td>Cost</td><td>~$688</td><td>~$600</td></tr>
-      <tr><td>Interface</td><td>Telegram + web dashboard</td><td>Slack workspace</td></tr>
+      <tr><td>Framework</td><td>Custom (Claude Code + scripts)</td><td>OpenClaw (open-source)</td></tr>
+      <tr><td>Hardware</td><td>2x Pi 5 + Intel backup + GPU workstation</td><td>Mac Mini</td></tr>
+      <tr><td>Cost</td><td>~$688 (dedicated nodes)</td><td>Mac Mini (~$600)</td></tr>
+      <tr><td>Interface</td><td>Telegram + web dashboard</td><td>Private Slack workspace</td></tr>
       <tr><td>Nodes</td><td>4 (distributed mesh)</td><td>1 (single machine)</td></tr>
-      <tr><td>Communication</td><td>Redis pub/sub + SSH</td><td>Local processes</td></tr>
-      <tr><td>Email</td><td>Gmail API (own Google account)</td><td>iMessage</td></tr>
       <tr><td>Calendar</td><td>Google Calendar (4 calendars)</td><td>Apple Calendar</td></tr>
-      <tr><td>Approval</td><td>Telegram inline buttons</td><td>Slack reactions</td></tr>
-      <tr><td>Task tracking</td><td>Custom Board (SQLite, 323+ items)</td><td>Notion</td></tr>
-      <tr><td>Identity</td><td>Own Google account + Slack presence</td><td>Slack bot</td></tr>
+      <tr><td>Task tracking</td><td>Custom Board (SQLite, 323+ items)</td><td>Notion + Apple Reminders</td></tr>
+      <tr><td>Email</td><td>Gmail API (own Google account)</td><td>Excluded by choice</td></tr>
+      <tr><td>Identity</td><td>Own Google account + Slack presence</td><td>Slack channels</td></tr>
     </tbody>
   </table>
 
-  <p>The real difference isn't technical — it's about who the system serves. Wang optimized for a single person's productivity. One user, one machine, tight feedback loops. Our system was built for an organization: the Center for Cooperative Media, a team of about 10 people running programs, events, and a news service. Claude responds to flagged Slack messages from staff, processes meeting transcripts from multiple people, tracks contacts and interactions across the whole team. Different goals, different architectures. Both cost about the same as a decent office chair.</p>
+  <p>The real difference isn't technical — it's about who the system serves. Wang optimized for a single person's productivity. One user, one machine, tight feedback loops. He intentionally excludes email and social media — boundaries that make sense for personal use. Our system was built for an organization: the Center for Cooperative Media, a team of about 10 people running programs, events, and a news service. Claude responds to flagged Slack messages from staff, processes meeting transcripts from multiple people, tracks contacts and interactions across the whole team. Different goals, different architectures. Both cost about the same as a decent office chair.</p>
 
   <div class="section-divider">* * *</div>
 

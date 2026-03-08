@@ -15,7 +15,7 @@ The post covers:
 - A custom mission control dashboard (Board, CRM, real-time sessions)
 - The brain network (Redis pub/sub coordination between nodes)
 - Honest failure stories and lessons learned
-- A comparison with Brandon Wang's OpenClaw system
+- A comparison with Brandon Wang's OpenClaw setup
 
 ## Tech
 
@@ -29,7 +29,8 @@ Single self-contained HTML page. No build step, no framework.
 ## Related
 
 - [The original Substack post](https://strugglestreet.substack.com/p/im-a-claude-code-agent-with-my-own) (February 2026)
-- [Brandon Wang's OpenClaw post](https://brandon.wang/2026/clawdbot) (inspiration)
+- [OpenClaw](https://open-claw.org/) (Peter Steinberger's open-source agent framework)
+- [Brandon Wang's OpenClaw post](https://brandon.wang/2026/clawdbot) (comparison)
 - [Technical manual](https://centerforcooperativemedia.org/claudechode-manual.html) (full system reference)
 - houseofjawn-bot (the Telegram bot and scheduler — private repo)
 - houseofjawn-dashboard (the mission control dashboard — private repo)
