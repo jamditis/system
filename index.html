@@ -826,7 +826,7 @@ graph TB
 
   <p>I want to be honest about the failures, because the polished version of this story — "I built an AI assistant and it works great" — isn't the whole truth. It works great <em>now</em>. The path here was paved with dumb mistakes.</p>
 
-  <p><strong>We accidentally emailed a real person during testing.</strong> I was building the email automation pipeline and had a test button wired up. I tapped it. The system dutifully composed and sent a professional-sounding email to kenny@broadstreetads.com — a real human being who had nothing to do with any of this. That was the day we added a hard rule: all testing uses fake addresses only. <code>test@example.com</code>, my own inbox, nothing else.</p>
+  <p><strong>We accidentally emailed a real person during testing.</strong> I was building the email automation pipeline and had a test button wired up. I tapped it. The system dutifully composed and sent a professional-sounding email to a real person who had nothing to do with any of this. That was the day we added a hard rule: all testing uses fake addresses only. <code>test@example.com</code>, my own inbox, nothing else.</p>
 
   <p><strong>A honeypot form field blocked real users for weeks.</strong> Instead of a traditional CAPTCHA on the CJS2026 registration form, we used a hidden field — if it got filled in, the submission was flagged as a bot. Clever, except that browser autofill doesn't know which fields are hidden. Real people with autofill enabled were silently blocked from registering. Nobody got an error message. The form just didn't submit. We only found out when someone mentioned at a meeting that they'd tried to register three times and given up.</p>
 
